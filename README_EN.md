@@ -1,6 +1,6 @@
 # RockByte
 
-简体中文 | [English](./README_EN.md)
+[简体中文](./README.md) | English
 
 A lua script developed for 2take1 users with the main goal of providing quick tasks and improving the public battlefield experience
 
