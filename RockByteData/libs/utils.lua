@@ -5,6 +5,8 @@ local _Module = {
 
 local RB_G = require('libs.global')
 local util_bas = require('utils.base')
+local util_str = require('utils.string')
+local util_err = require('utils.error')
 
 function _Module.menu_binding(menus)
     for _, f_info in pairs(menus) do
@@ -13,6 +15,64 @@ function _Module.menu_binding(menus)
         else
             RB_G.menu[f_info[1]] = menu.add_feature(f_info[2], f_info[3], f_info[4])
         end
+    end
+end
+
+function _Module.menu_get_last_menu(keys, kwargs)
+    kwargs = kwargs or {}
+    kwargs.is_nil_err = kwargs.is_nil_err or false
+    local tbl_keys = util_str.split(keys, '.')
+    local menus = RB_G.menu
+    for i = 1, #tbl_keys - 1 do
+        menus[tbl_keys[i]] = menus[tbl_keys[i]] or {}
+        menus = menus[tbl_keys[i]]
+        if kwargs.is_nil_err and menus == nil then
+            local curr_keys = table.concat(tbl_keys, '.', 1, i)
+            util_err.value_error('this menu "' .. curr_keys .. '" does not exist')
+        end
+    end
+    return table.unpack(menus, tbl_keys[#tbl_keys])
+end
+
+function _Module.menu_set_property(keys, kwargs)
+    local last_menu, key = _Module.menu_get_last_menu(keys)
+    for k, v in pairs(kwargs) do
+        if k == 'str_data' then
+            last_menu[key]:set_str_data(v)
+        else
+            last_menu[key][k] = v
+        end
+    end
+end
+
+function _Module.menu_get_id(p_keys)
+    local last_menu, key = _Module.menu_get_last_menu(p_keys)
+    return last_menu[key].id
+end
+
+function _Module.menu_add(keys, name, t_feat, p_keys, func)
+    local last_menu, key = _Module.menu_get_last_menu(keys)
+    local p_id = 0
+    if type(p_keys) == 'string' then
+        p_id = _Module.menu_get_id(p_keys)
+    elseif type(p_keys) == 'number' then
+        p_id = p_keys
+    else
+        util_err.is_not_type_error({'number', 'string'}, p_keys)
+    end
+    last_menu[key] = menu.add_feature(name, t_feat, p_id, func)
+end
+
+function _Module.menus_set_property(tbl_menus_property)
+    for _, properties in pairs(tbl_menus_property) do
+        _Module.menu_set_property(properties[1], properties[2])
+    end
+end
+
+function _Module.menus_add(tbl_menus)
+    for _, f_info in pairs(tbl_menus) do
+        local func = #f_info > 4 and f_info[5] or nil
+        _Module.menu_add(f_info[1], f_info[2], f_info[3], f_info[4], func)
     end
 end
 

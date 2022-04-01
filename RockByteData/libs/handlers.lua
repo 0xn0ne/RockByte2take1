@@ -124,8 +124,8 @@ function _Module.loop(feat)
                 if RB_G.log_obj['modder_monitor'] == nil then
                     RB_G.log_obj['modder_monitor'] = util_log:new('modder_monitor', RB_G.paths.logs)
                 end
-                RB_G.log_obj['modder_monitor']:log(string.format('检测到 %s 作弊,作弊标记为: %s',
-                    plyer_union, flags_str))
+                RB_G.log_obj['modder_monitor']:log(string.format('检测到 %s 作弊,作弊标记为: %s', plyer_union,
+                    flags_str))
             end
         end
         ::continue::
@@ -461,91 +461,91 @@ end
 --     return HANDLER_CONTINUE
 -- end
 
--- function _Module.stat_addt(feat)
---     if feat.value == 0 then
---         RB_U.notify(
---             '如果你是第一次知道这个东西或者你不知道这个东西的作用和后果请不要继续.乱改时间有可能导致封号!\n修改方式是在原来在线时间的基础上增加指定的在线时长.该操作会修改这两个值"GTA在线模式中花费的时间"和当前"角色使用时间"',
---             RB_G.lvl.INF, {seconds = 30})
---         return
---     end
---     local time_ms = {
---         3600000, 3600000 * 24, 3600000 * 24 * 7, 3600000 * 24 * 30,
---         3600000 * 24 * 30 * 3, 3600000 * 24 * 30 * 6, 3600000 * 24 * 30 * 12
---     }
---     local playing_ms
---     local mp_total_ms
---     if not RB_U.control_stats(function(args)
---         playing_ms =
---             args.get_u64(args.hash('MP_PLAYING_TIME', {is_mp = false})) +
---                 time_ms[feat.value]
---         -- args.set_u64(args.hash('MP_PLAYING_TIME', {is_mp = false}), playing_ms)
---         mp_total_ms = args.get_u64(args.hash('TOTAL_PLAYING_TIME')) +
---                           time_ms[feat.value]
---         -- args.set_u64(args.hash('TOTAL_PLAYING_TIME'), mp_total_ms)
---         return true
---     end) then return end
---     print(10001, playing_ms)
---     print(10002, mp_total_ms)
---     local playing_time = util_tim.concat(
---                              util_tim.convert_select({millisecond = playing_ms},
---                                                      {
---             only = {util_tim.day, util_tim.hor, util_tim.min, util_tim.sec}
---         }))
---     local mp_total_time = util_tim.concat(util_tim.convert({
---         millisecond = mp_total_ms
---     }, {only = {util_tim.day, util_tim.hor, util_tim.min, util_tim.sec}}))
---     RB_U.notify(string.format(
---                     '操作成功!\n当前游戏在线时间为: %s\n当前角色使用时间为: %s\n请使用ALT+F4并等待右下角圆圈消失后完成保存',
---                     playing_time, mp_total_time), RB_G.lvl.SUC)
--- end
+function _Module.stat_addt(feat)
+    if feat.value == 0 then
+        RB_U.notify(
+            '如果你是第一次知道这个东西或者你不知道这个东西的作用和后果请不要继续.乱改时间有可能导致封号!\n修改方式是在原来在线时间的基础上增加指定的在线时长.该操作会修改这两个值"GTA在线模式中花费的时间"和当前"角色使用时间"',
+            RB_G.lvl.INF, {
+                seconds = 30
+            })
+        return
+    end
+    local time_ms = {3600000, 3600000 * 24, 3600000 * 24 * 7, 3600000 * 24 * 30, 3600000 * 24 * 30 * 3,
+                     3600000 * 24 * 30 * 6, 3600000 * 24 * 30 * 12}
+    local playing_ms
+    local mp_total_ms
+    if not RB_U.control_stats(function(args)
+        playing_ms = args.get_u64(args.hash('MP_PLAYING_TIME', {
+            is_mp = false
+        })) + time_ms[feat.value]
+        args.set_u64(args.hash('MP_PLAYING_TIME', {
+            is_mp = false
+        }), playing_ms, 1)
+        mp_total_ms = args.get_u64(args.hash('TOTAL_PLAYING_TIME')) + time_ms[feat.value]
+        args.set_u64(args.hash('TOTAL_PLAYING_TIME'), mp_total_ms, 1)
+        return true
+    end) then
+        return
+    end
+    local playing_time = util_tim.date2string(util_tim.ms2date(playing_ms, {
+        only = {util_tim.day, util_tim.hor, util_tim.min, util_tim.sec}
+    }))
+    local mp_total_time = util_tim.date2string(util_tim.ms2date(mp_total_ms, {
+        only = {util_tim.day, util_tim.hor, util_tim.min, util_tim.sec}
+    }))
+    RB_U.notify(string.format(
+        '操作成功!\n当前游戏在线时间为: %s\n当前角色使用时间为: %s\n请使用ALT+F4并等待右下角圆圈消失后完成保存',
+        playing_time, mp_total_time), RB_G.lvl.SUC)
+end
 
--- function _Module.stat_rdct(feat)
---     if feat.value == 0 then
---         RB_U.notify(
---             '如果你是第一次知道这个东西或者你不知道这个东西的作用和后果请不要继续, 乱改时间有可能导致封号!\n修改方式是在原来在线时间的基础上减少指定的在线时长. 该操作会修改这两个值 "GTA在线模式中花费的时间" 和当前 "角色使用时间"',
---             RB_G.lvl.INF, {seconds = 30})
---         return
---     end
---     local time_ms = {
---         3600000, 3600000 * 24, 3600000 * 24 * 7, 3600000 * 24 * 30,
---         3600000 * 24 * 30 * 3, 3600000 * 24 * 30 * 6, 3600000 * 24 * 30 * 12
---     }
---     local playing_ms
---     local mp_total_ms
---     if not RB_U.control_stats(function(args)
---         local cur_playing_ms = args.get_u64(
---                                    args.hash('MP_PLAYING_TIME', {is_mp = false}))
---         if cur_playing_ms < time_ms[feat.value] then
---             RB_U.notify(
---                 '当前在线时长不足! 你到底懂不懂这是什么?',
---                 RB_G.lvl.WRN)
---             return
---         end
---         playing_ms = cur_playing_ms - time_ms[feat.value]
---         -- args.set_u64(args.hash('MP_PLAYING_TIME', {is_mp = false}), playing_ms)
---         mp_total_ms = args.get_u64(args.hash('TOTAL_PLAYING_TIME')) -
---                           time_ms[feat.value]
---         -- args.set_u64(args.hash('TOTAL_PLAYING_TIME'), mp_total_ms)
---         return true
---     end) then return end
---     local playing_time = util_tim.concat(--                              util_tim.convert_select({millisecond = playing_ms},
---                                                      {
---             only = {util_tim.day, util_tim.hor, util_tim.min, util_tim.sec}
---         }))
---     local mp_total_time = util_tim.concat(util_tim.convert({
---         millisecond = mp_total_ms
---     }, {only = {util_tim.day, util_tim.hor, util_tim.min, util_tim.sec}}))
---     RB_U.notify(string.format(
---                     '操作成功!\n当前游戏在线时间为: %s\n当前角色使用时间为: %s\n请使用ALT+F4并等待右下角圆圈消失后完成保存',
---                     playing_time, mp_total_time), RB_G.lvl.SUC)
--- end
+function _Module.stat_rdct(feat)
+    if feat.value == 0 then
+        RB_U.notify(
+            '如果你是第一次知道这个东西或者你不知道这个东西的作用和后果请不要继续, 乱改时间有可能导致封号!\n修改方式是在原来在线时间的基础上减少指定的在线时长. 该操作会修改这两个值 "GTA在线模式中花费的时间" 和当前 "角色使用时间"',
+            RB_G.lvl.INF, {
+                seconds = 30
+            })
+        return
+    end
+    local time_ms = {3600000, 3600000 * 24, 3600000 * 24 * 7, 3600000 * 24 * 30, 3600000 * 24 * 30 * 3,
+                     3600000 * 24 * 30 * 6, 3600000 * 24 * 30 * 12}
+    local playing_ms
+    local mp_total_ms
+    if not RB_U.control_stats(function(args)
+        local cur_playing_ms = args.get_u64(args.hash('MP_PLAYING_TIME', {
+            is_mp = false
+        }))
+        if cur_playing_ms < time_ms[feat.value] then
+            RB_U.notify('当前在线时长不足! 你到底懂不懂这是什么?', RB_G.lvl.WRN)
+            return
+        end
+        playing_ms = cur_playing_ms - time_ms[feat.value]
+        args.set_u64(args.hash('MP_PLAYING_TIME', {
+            is_mp = false
+        }), playing_ms, 1)
+        mp_total_ms = args.get_u64(args.hash('TOTAL_PLAYING_TIME')) - time_ms[feat.value]
+        args.set_u64(args.hash('TOTAL_PLAYING_TIME'), mp_total_ms, 1)
+        return true
+    end) then
+        return
+    end
+    local playing_time = util_tim.date2string(util_tim.ms2date(playing_ms, {
+        only = {util_tim.day, util_tim.hor, util_tim.min, util_tim.sec}
+    }))
+    local mp_total_time = util_tim.date2string(util_tim.ms2date(mp_total_ms, {
+        only = {util_tim.day, util_tim.hor, util_tim.min, util_tim.sec}
+    }))
+    RB_U.notify(string.format(
+        '操作成功!\n当前游戏在线时间为: %s\n当前角色使用时间为: %s\n请使用ALT+F4并等待右下角圆圈消失后完成保存',
+        playing_time, mp_total_time), RB_G.lvl.SUC)
+end
 
 function _Module.char_judg_swtc(feat)
     RB_G.cfgs:set('CHAR', 'chat_judge_enable', feat.on)
     if RB_G.cfgs:get('CHAR', 'chat_judge_enable') then
         RB_G.eve_lis.chat_judge = event.add_event_listener("chat", function(eve)
             for _, value in ipairs(RB_G.jud_kws) do
-                if util_str.contains(eve.body, value, true) then
+                if value ~= '' and util_str.contains(eve.body, value, true) then
                     if RB_G.cfgs:get('CHAR', 'chat_judge_type') == 0 then
                         RB_U.game_crashes_kek(eve.player)
                     elseif RB_G.cfgs:get('CHAR', 'chat_judge_type') == 1 then
@@ -592,10 +592,6 @@ function _Module.char_judg_keys_add(feat)
     _Module.refresh_chat_judge_keywords()
 end
 
-function _Module.char_judg_swtc(feat)
-    RB_U.notify('不确定这个功能要不要添加, 做人可能低调点好', RB_G.lvl.INF)
-end
-
 function _Module.char_warn_msgs(feat)
     RB_U.notify('不确定这个功能要不要添加, 做人可能低调点好', RB_G.lvl.INF)
 end
@@ -608,7 +604,7 @@ function _Module.char_judg_keys_hand(feat)
     if feat.value == 0 then
         local respone, data = nil, nil
         while true do
-            respone, data = input.get("输入新的审判关键字", "", 20, 0)
+            respone, data = input.get('输入新的审判关键字', RB_G.jud_kws[feat.data.index], 20, 0)
             if respone == 1 then
                 system.yield(100)
             elseif respone == 2 then
@@ -628,6 +624,76 @@ function _Module.char_judg_keys_hand(feat)
         RB_G.jud_kws = tmp_keys
     end
     _Module.refresh_chat_judge_keywords()
+end
+
+function _Module.heis_part_paym(feat)
+    local respone, data = nil, nil
+    while true do
+        respone, data = input.get('输入分红百分比', '85', 10, 0)
+        if respone == 1 then
+            system.yield(100)
+        elseif respone == 2 then
+            return
+        else
+            break
+        end
+    end
+    local payment = tonumber(data)
+    script.set_global_i(1934631 + 3008 + 1, payment)
+end
+
+function _Module.heis_diam_paym(feat)
+    local respone, data = nil, nil
+    while true do
+        respone, data = input.get('输入分红百分比', '85', 10, 0)
+        if respone == 1 then
+            system.yield(100)
+        elseif respone == 2 then
+            return
+        else
+            break
+        end
+    end
+    local payment = tonumber(data)
+    for i = 1, player.player_count() do
+        script.set_global_i(1966718 + 2325 + i, payment)
+    end
+end
+
+function _Module.heis_peri_paym(feat)
+    local respone, data = nil, nil
+    while true do
+        respone, data = input.get('输入分红百分比', '85', 10, 0)
+        if respone == 1 then
+            system.yield(100)
+        elseif respone == 2 then
+            return
+        else
+            break
+        end
+    end
+    local payment = tonumber(data)
+    for i = 1, player.player_count() do
+        script.set_global_i(1973496 + 823 + 56 + i, payment)
+    end
+end
+
+function _Module.heis_doom_paym(feat)
+    local respone, data = nil, nil
+    while true do
+        respone, data = input.get('输入分红百分比', '85', 10, 0)
+        if respone == 1 then
+            system.yield(100)
+        elseif respone == 2 then
+            return
+        else
+            break
+        end
+    end
+    local payment = tonumber(data)
+    for i = 1, player.player_count() do
+        script.set_global_i(1962755 + 812 + 50 + i, payment)
+    end
 end
 
 function _Module.refresh_chat_judge_keywords()

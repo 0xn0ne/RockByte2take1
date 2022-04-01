@@ -3,7 +3,7 @@ if __ROCKBITE_VERSION then
     return
 end
 
-__ROCKBITE_VERSION = '0.1.5'
+__ROCKBITE_VERSION = '0.1.6·'
 
 -- todo: 在线时长修改
 -- todo: 聊天审批
@@ -96,52 +96,27 @@ for k, v in pairs(paths) do
 end
 
 -- 菜单绑定
-RB_G.menu.main = menu.add_feature('RockByte', 'parent', 0)
-RB_U.menu_binding({ -- {'test', '测试菜单', 'action_value_str', RB_G.menu.main.id, RB_H.test},
-{'onli', '在线玩家', 'parent', RB_G.menu.main.id}, {'wrld', '世界选项', 'parent', RB_G.menu.main.id},
-{'tele', '传送选项', 'parent', RB_G.menu.main.id}, {'stat', '统计选项', 'parent', RB_G.menu.main.id},
-{'mntr', '作弊监控', 'parent', RB_G.menu.main.id}, {'chat', '聊天选项', 'parent', RB_G.menu.main.id},
-{'sett', '菜单设置', 'parent', RB_G.menu.main.id}, {'loop', '监控循环', 'toggle', 0, RB_H.loop}})
+RB_U.menus_add({ -- {'test', '测试菜单', 'action_value_str', RB_G.menu.main.id, RB_H.test},
+{'main', 'RockByte', 'parent', 0}, {'onli', '在线玩家', 'parent', 'main'},
+{'wrld', '世界选项', 'parent', 'main'}, {'tele', '传送选项', 'parent', 'main'},
+{'stat', '统计选项', 'parent', 'main'}, {'mntr', '作弊监控', 'parent', 'main'},
+{'chat', '聊天选项', 'parent', 'main'}, {'sett', '菜单设置', 'parent', 'main'},
+{'loop', '监控循环', 'toggle', 0, RB_H.loop}})
 RB_G.menu.loop.hidden = true
 RB_G.menu.loop.on = true
-
 RB_G.menu.test:set_str_data(RB_G.cra_typ)
 
-RB_U.menu_binding({{'mntr_swtc', '开启监控', 'toggle', RB_G.menu.mntr.id, RB_H.mntr_swtc},
-                   {'mntr_disp', '实时显示', 'toggle', RB_G.menu.mntr.id, RB_H.mntr_disp},
-                   {'mntr_mlog', '记录日志', 'toggle', RB_G.menu.mntr.id, RB_H.mntr_mlog},
-                   {'mntr_coln', '每行玩家个数', 'autoaction_value_i', RB_G.menu.mntr.id, RB_H.mntr_coln},
-                   {'mntr_size', '字体大小', 'autoaction_value_i', RB_G.menu.mntr.id, RB_H.mntr_size},
-                   {'mntr_heig', '行高倍数', 'autoaction_value_f', RB_G.menu.mntr.id, RB_H.mntr_heig},
-                   {'mntr_red', 'RD', 'autoaction_value_i', RB_G.menu.mntr.id, RB_H.mntr_red},
-                   {'mntr_gren', 'GN', 'autoaction_value_i', RB_G.menu.mntr.id, RB_H.mntr_gren},
-                   {'mntr_blue', 'BU', 'autoaction_value_i', RB_G.menu.mntr.id, RB_H.mntr_blue},
-                   {'mntr_alph', '不透明度', 'autoaction_value_i', RB_G.menu.mntr.id, RB_H.mntr_alph},
-                   {'mntr_slep', '检测间隔ms', 'autoaction_value_i', RB_G.menu.mntr.id, RB_H.mntr_slep},
-                   {'tele_auto', '自动传标记点', 'toggle', RB_G.menu.tele.id, RB_H.tele_auto},
-                   {'tele_fowr', '向前闪现', 'action_value_i', RB_G.menu.tele.id, RB_H.tele_fowr},
-                   {'tele_kosa', '传送到虎鲸', 'action', RB_G.menu.tele.id, RB_H.tele_kosa},
-                   {'wrld_ctrl_rang', '控制范围', 'autoaction_value_f', RB_G.menu.wrld.id, RB_H.wrld_ctrl_rang},
-                   {'wrld_npcs_kill', 'NPC自动死亡', 'toggle', RB_G.menu.wrld.id, RB_H.wrld_npcs_kill},
-                   {'wrld_npcs_remo', 'NPC自动移除', 'toggle', RB_G.menu.wrld.id, RB_H.wrld_npcs_remo},
-                   {'wrld_npcs_t2me', 'NPC自动传送面前', 'toggle', RB_G.menu.wrld.id, RB_H.wrld_npcs_t2me},
-                   {'wrld_npcs_frze', 'NPC自动冻结', 'toggle', RB_G.menu.wrld.id, RB_H.wrld_npcs_frze},
-                   {'wrld_objs_tele', '物品自动传送面前', 'toggle', RB_G.menu.wrld.id, RB_H.wrld_objs_tele},
-                   {'stat_addt', '增加在线时长', 'action_value_str', RB_G.menu.stat.id, RB_H.stat_addt},
-                   {'stat_rdct', '减少在线时长', 'action_value_str', RB_G.menu.stat.id, RB_H.stat_rdct},
-                   {'char_warn', '警告喊话', 'parent', RB_G.menu.chat.id},
-                   {'char_judg', '聊天审判', 'parent', RB_G.menu.chat.id},
-                   {'sett_save', '保存设置', 'action', RB_G.menu.sett.id, RB_H.sett_save}})
-
-RB_U.menu_binding({{'char_judg_swtc', '开启审判', 'toggle', RB_G.menu.char_judg.id, RB_H.char_judg_swtc},
-                   {'char_judg_type', '崩溃方式', 'autoaction_value_str', RB_G.menu.char_judg.id,
-                    RB_H.char_judg_type},
-                   {'char_judg_noti', '是否通知', 'toggle', RB_G.menu.char_judg.id, RB_H.char_judg_noti},
-                   {'char_judg_keys_add', '添加关键字', 'action', RB_G.menu.char_judg.id, RB_H.char_judg_keys_add},
-                   {'char_judg_swtc', '开启警告', 'action', RB_G.menu.char_warn.id, RB_H.char_judg_swtc},
-                   {'char_warn_msgs', '短信喊话', 'action', RB_G.menu.char_warn.id, RB_H.char_warn_msgs},
-                   {'char_warn_glob', '公屏喊话', 'action', RB_G.menu.char_warn.id, RB_H.char_warn_glob}})
-
+RB_U.menus_add({{'mntr_swtc', '开启监控', 'toggle', 'mntr', RB_H.mntr_swtc},
+                {'mntr_disp', '实时显示', 'toggle', 'mntr', RB_H.mntr_disp},
+                {'mntr_mlog', '记录日志', 'toggle', 'mntr', RB_H.mntr_mlog},
+                {'mntr_coln', '每行玩家个数', 'autoaction_value_i', 'mntr', RB_H.mntr_coln},
+                {'mntr_size', '字体大小', 'autoaction_value_i', 'mntr', RB_H.mntr_size},
+                {'mntr_heig', '行高倍数', 'autoaction_value_f', 'mntr', RB_H.mntr_heig},
+                {'mntr_red', 'RD', 'autoaction_value_i', 'mntr', RB_H.mntr_red},
+                {'mntr_gren', 'GN', 'autoaction_value_i', 'mntr', RB_H.mntr_gren},
+                {'mntr_blue', 'BU', 'autoaction_value_i', 'mntr', RB_H.mntr_blue},
+                {'mntr_alph', '不透明度', 'autoaction_value_i', 'mntr', RB_H.mntr_alph},
+                {'mntr_slep', '检测间隔ms', 'autoaction_value_i', 'mntr', RB_H.mntr_slep}})
 RB_G.menu.mntr_swtc.on = RB_G.cfgs:get('MNTR', 'modder_monitor_enable')
 RB_G.menu.mntr_disp.on = RB_G.cfgs:get('MNTR', 'display')
 RB_G.menu.mntr_mlog.on = RB_G.cfgs:get('MNTR', 'log_enable')
@@ -178,12 +153,21 @@ RB_G.menu.mntr_slep.max = 20000
 RB_G.menu.mntr_slep.mod = 1000
 RB_G.menu.mntr_slep.value = RB_G.cfgs:get('MNTR', 'sleep')
 
+RB_U.menus_add({{'tele_auto', '自动传标记点', 'toggle', 'tele', RB_H.tele_auto},
+                {'tele_fowr', '向前闪现', 'action_value_i', 'tele', RB_H.tele_fowr},
+                {'tele_kosa', '传送到虎鲸', 'action', 'tele', RB_H.tele_kosa}})
 RB_G.menu.tele_auto.on = RB_G.cfgs:get('TELE', 'auto_teleport')
 RB_G.menu.tele_fowr.min = 1
 RB_G.menu.tele_fowr.max = 25
 RB_G.menu.tele_fowr.mod = 2
 RB_G.menu.tele_fowr.value = RB_G.cfgs:get('TELE', 'flash_distance')
 
+RB_U.menus_add({{'wrld_ctrl_rang', '控制范围', 'autoaction_value_f', 'wrld', RB_H.wrld_ctrl_rang},
+                {'wrld_npcs_kill', 'NPC自动死亡', 'toggle', 'wrld', RB_H.wrld_npcs_kill},
+                {'wrld_npcs_remo', 'NPC自动移除', 'toggle', 'wrld', RB_H.wrld_npcs_remo},
+                {'wrld_npcs_t2me', 'NPC自动传送面前', 'toggle', 'wrld', RB_H.wrld_npcs_t2me},
+                {'wrld_npcs_frze', 'NPC自动冻结', 'toggle', 'wrld', RB_H.wrld_npcs_frze},
+                {'wrld_objs_tele', '物品自动传送面前', 'toggle', 'wrld', RB_H.wrld_objs_tele}})
 RB_G.menu.wrld_ctrl_rang.min = 25
 RB_G.menu.wrld_ctrl_rang.max = 500
 RB_G.menu.wrld_ctrl_rang.mod = 25
@@ -194,27 +178,63 @@ RB_G.menu.wrld_npcs_t2me.on = RB_G.cfgs:get('WRLD', 'npcs_teleport_to_me')
 RB_G.menu.wrld_npcs_frze.on = RB_G.cfgs:get('WRLD', 'npcs_freeze')
 RB_G.menu.wrld_objs_tele.on = RB_G.cfgs:get('WRLD', 'objects_teleport')
 
+RB_U.menus_add({{'stat_addt', '增加在线时长', 'action_value_str', 'stat', RB_H.stat_addt},
+                {'stat_rdct', '减少在线时长', 'action_value_str', 'stat', RB_H.stat_rdct}})
 RB_G.menu.stat_addt:set_str_data({'先按确定看说明', '1hor', '1day', '1wek', '1mon', '3mon', '6mon', '1yer'})
 RB_G.menu.stat_rdct:set_str_data({'先按确定看说明', '1hor', '1day', '1wek', '1mon', '3mon', '6mon', '1yer'})
 
+RB_U.menus_add({{'char_warn', '警告喊话', 'parent', 'chat'}, {'char_judg', '聊天审判', 'parent', 'chat'},
+                {'char_judg_swtc', '开启审判', 'toggle', 'char_judg', RB_H.char_judg_swtc},
+                {'char_judg_type', '崩溃方式', 'autoaction_value_str', 'char_judg', RB_H.char_judg_type},
+                {'char_judg_noti', '是否通知', 'toggle', 'char_judg', RB_H.char_judg_noti},
+                {'char_judg_keys_add', '添加关键字', 'action', 'char_judg', RB_H.char_judg_keys_add},
+                {'char_warn_swtc', '开启警告', 'action', 'char_warn', RB_H.char_warn_swtc},
+                {'char_warn_msgs', '短信喊话', 'action', 'char_warn', RB_H.char_warn_msgs},
+                {'char_warn_glob', '公屏喊话', 'action', 'char_warn', RB_H.char_warn_glob}})
 RB_G.menu.char_judg_swtc.on = RB_G.cfgs:get('CHAR', 'chat_judge_enable')
 RB_G.menu.char_judg_type:set_str_data({'kek', 'mmt'})
 RB_G.menu.char_judg_type.value = RB_G.cfgs:get('CHAR', 'chat_judge_type')
 RB_G.menu.char_judg_noti.on = RB_G.cfgs:get('CHAR', 'chat_judge_notice')
-
 RB_G.menu.char_judg_keys = {}
 RB_G.jud_kws = util_str.split(RB_G.cfgs:get('CHAR', 'chat_judge_keywords'), ', ')
 RB_H.refresh_chat_judge_keywords()
 
-RB_G.menu.onli_play = {}
+RB_U.menus_add({{'heis', '抢劫选项', 'parent', 'main'}, {'heis_part', '公寓抢劫', 'parent', 'heis'},
+                {'heis_part_paym', '修改分红', 'action', 'heis_part', RB_H.heis_part_paym},
+                {'heis_diam', '名钻赌场', 'parent', 'heis'},
+                {'heis_diam_paym', '修改分红', 'action', 'heis_diam', RB_H.heis_diam_paym},
+                {'heis_peri', '佩里科岛', 'parent', 'heis'},
+                {'heis_peri_paym', '修改分红', 'action', 'heis_peri', RB_H.heis_peri_paym},
+                {'heis_doom', '末日豪劫', 'parent', 'heis'},
+                {'heis_doom_paym', '修改分红', 'action', 'heis_doom', RB_H.heis_doom_paym}})
+
+RB_U.menus_add({{'sett_save', '保存设置', 'action', 'sett', RB_H.sett_save}})
+
+-- RB_G.menu.onli_play = {}
 for ply_i = 0, RB_G.max_player do
-    RB_G.menu.onli_play[ply_i] = menu.add_feature('player_' .. ply_i, 'parent', RB_G.menu.onli.id)
-    local to_perico = menu.add_feature('传送佩里科岛', 'action', RB_G.menu.onli_play[ply_i].id, RB_H.onli_2prc)
-    local to_partment = menu.add_feature('日蚀公寓传送', 'action', RB_G.menu.onli_play[ply_i].id, RB_H.onli_2par)
-    local teleport2me = menu.add_feature('到我面前(目标在载具中有效)', 'action',
-        RB_G.menu.onli_play[ply_i].id, RB_H.onli_tp2m)
-    local game_crashes = menu.add_feature('游戏崩溃', 'action_value_str', RB_G.menu.onli_play[ply_i].id,
-        RB_H.onli_cras)
+    local p_keys = 'onli_play.player_' .. ply_i
+    RB_U.menus_add({{p_keys, p_keys, 'parent', RB_G.menu.onli.id},
+                    {p_keys .. '.to_perico', '传送佩里科岛', 'action', p_keys, RB_H.onli_2prc},
+                    {p_keys .. '.to_partment', '传送日蚀公寓', 'action', p_keys, RB_H.onli_2par},
+                    {p_keys .. '.teleport2me', '到我面前(目标在载具中有效)', 'action', p_keys,
+                     RB_H.onli_tp2m}, {p_keys .. '.game_crashes', '游戏崩溃', 'action', p_keys, RB_H.onli_cras}})
+    local data = {
+        ply_id = ply_i
+    }
+    RB_U.menus_set_property({{p_keys .. '.to_perico', {
+        threaded = false,
+        data = data
+    }, {p_keys .. '.to_partment', {
+        threaded = false,
+        data = data
+    }}, {p_keys .. '.teleport2me', {
+        threaded = false,
+        data = data
+    }}, {p_keys .. '.game_crashes', {
+        threaded = false,
+        data = data,
+        str_data = RB_G.cra_typ
+    }}}})
     -- 该函数好像不起作用
     -- local set_god = menu.add_feature('设置无敌', 'action',
     --                                  RB_G.menu.onli_play[ply_i].id,
@@ -223,32 +243,11 @@ for ply_i = 0, RB_G.max_player do
     -- local teleport2mycar = menu.add_feature('到我车里', 'action',
     --                                         RB_G.menu.onli_play[ply_i].id,
     --                                         RB_H.onli_teleport2mycar)
-    to_perico.data = {
-        ply_id = ply_i
-    }
-    to_perico.threaded = false
-    to_partment.data = {
-        ply_id = ply_i
-    }
-    to_partment.threaded = false
-    teleport2me.data = {
-        ply_id = ply_i
-    }
-    teleport2me.threaded = false
-    game_crashes.data = {
-        ply_id = ply_i
-    }
-    game_crashes.threaded = false
-    game_crashes:set_str_data(RB_G.cra_typ)
-    -- set_god.data = {player_i = ply_i}
-    -- set_god.threaded = false
-    -- teleport2mycar.data = {player_i = ply_i}
-    -- teleport2mycar.threaded = false
 end
 
 -- -- 该函数好像不起作用
 -- RB_G.menu.wrld_comb = menu.add_feature('NPC战斗方式', 'value_i',
---                                      RB_G.menu.wrld.id, RB_H.wrld_comb)
+--                                      'wrld', RB_H.wrld_comb)
 -- RB_G.menu.wrld_comb.min = 0
 -- RB_G.menu.wrld_comb.max = 100
 -- RB_G.menu.wrld_comb.mod = 1
@@ -256,7 +255,7 @@ end
 -- RB_G.menu.wrld_comb.on = RB_G.cfgs:get('WRLD', 'combat_ability_on')
 -- -- 该函数好像不起作用
 -- RB_G.menu.wrld_accu = menu.add_feature('NPC射击精准', 'value_i',
---                                      RB_G.menu.wrld.id, RB_H.wrld_accu)
+--                                      'wrld', RB_H.wrld_accu)
 -- RB_G.menu.wrld_accu.min = 0
 -- RB_G.menu.wrld_accu.max = 100
 -- RB_G.menu.wrld_accu.mod = 5
