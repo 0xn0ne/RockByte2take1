@@ -4,6 +4,9 @@ local _Module = {
 }
 
 _Module.menu = {}
+_Module.menu_player_keys = 'onli_play.player_%d'
+_Module.menu_player_feat_keys = 'onli_play.player_feat_%d'
+
 _Module.cfgs = {}
 _Module.paths = {}
 _Module.max_player = 32
@@ -199,7 +202,7 @@ _Module.eve.n2h = {
     bounty = 1294995624
 }
 
-_Module.cra_typ = {"kek", "mmt"}
+_Module.cra_typ = {'kek', 'mmt'}
 
 _Module.eve.crs = {
     kek = {962740265, -1386010354, 2112408256, 677240627}

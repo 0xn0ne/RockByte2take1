@@ -27,10 +27,6 @@ function _Module.test(feat)
         include_player = true
     })
 
-    -- for i = 1, 32, 1 do
-    --     util_bas.print(10001, player.get_player_name(i),
-    --                     player.is_player_valid(i))
-    -- end
     RB_U.notify('加载' .. RB_G.cra_typ[feat.value + 1] .. "", RB_G.lvl.INF)
     RB_U.notify('TEST MESSAGE CONTENT, RED NOTIFY', RB_G.lvl.ERR)
     RB_U.notify('TEST MESSAGE CONTENT, YELLOW NOTIFY', RB_G.lvl.WRN)
@@ -53,14 +49,20 @@ function _Module.loop(feat)
         ply_info.mod = RB_U.get_player_info_modder(ply_i)
         local old_ply_info = RB_G.ply.inf[ply_info.name]
         if ply_i == player.player_id() or ply_info.scid <= 0 then
-            RB_G.menu.onli_play[ply_i].hidden = true
+            -- RB_U.menu_set_property(string.format(RB_G.menu_player_keys, ply_i), {
+            --     hidden = true
+            -- })
             goto continue
         end
-        RB_G.menu.onli_play[ply_i].hidden = false
+        -- RB_U.menu_set_property(string.format(RB_G.menu_player_keys, ply_i), {
+        --     hidden = false
+        -- })
 
         RB_G.ply.inf[ply_info.name] = ply_info
         RB_G.ply.onl[ply_info.name] = ply_i
-        RB_G.menu.onli_play[ply_i].name = ply_info.name
+        -- RB_U.menu_set_property(string.format(RB_G.menu_player_keys, ply_i), {
+        --     name = ply_info.name
+        -- })
         local ply_name = player.get_player_name(ply_i)
 
         if not RB_G.cfgs:get('MNTR', 'modder_monitor_enable') then
@@ -133,47 +135,62 @@ function _Module.loop(feat)
     return HANDLER_CONTINUE
 end
 
-function _Module.onli_2prc(feat, data)
+function _Module.onli_2prc(feat, pid)
+    if player.player_id() == pid then
+        RB_U.notify('你正在对自己进行恶意操作!本次操作取消', RB_G.lvl.WRN)
+        return
+    end
     RB_U.notify('开始操作,请稍后', RB_G.lvl.INF)
-    RB_U.send_script_event_by_name(RB_G.eve.nme.send_to_perico_island, data.ply_id,
-        {data.ply_id, RB_G.eve.n2h.send_to_perico_island, 0, 0})
+    RB_U.send_script_event_by_name(RB_G.eve.nme.send_to_perico_island, pid,
+        {pid, RB_G.eve.n2h.send_to_perico_island, 0, 0})
     RB_U.notify('操作完成', RB_G.lvl.SUC)
 end
 
-function _Module.onli_2par(feat, data)
+function _Module.onli_2par(feat, pid)
+    if player.player_id() == pid then
+        RB_U.notify('你正在对自己进行恶意操作!本次操作取消', RB_G.lvl.WRN)
+        return
+    end
     RB_U.notify('开始操作,请稍后', RB_G.lvl.INF)
-    RB_U.send_script_event_by_name(RB_G.eve.nme.send_to_eclipse, data.ply_id,
-        {data.ply_id, data.ply_id, -1, 0, 128, 1, 1, 20})
+    RB_U.send_script_event_by_name(RB_G.eve.nme.send_to_eclipse, pid, {pid, pid, -1, 0, 128, 1, 1, 20})
     RB_U.notify('操作完成', RB_G.lvl.SUC)
 end
 
-function _Module.onli_tp2m(feat, data)
+function _Module.onli_tp2m(feat, pid)
+    if player.player_id() == pid then
+        RB_U.notify('你正在对自己进行恶意操作!本次操作取消', RB_G.lvl.WRN)
+        return
+    end
     RB_U.notify('开始操作,请稍后', RB_G.lvl.INF)
-    local player_ped = player.get_player_ped(data.ply_id)
+    local player_ped = player.get_player_ped(pid)
 
     local coords = RB_U.gen_player_front_coords(player.player_id())
-    local resu = RB_U.teleport(player_ped, v3(coords.x, coords.y, coords.z), {
-        before_teleport = function(entity_id, coords, kwargs)
-            return RB_U.request_control_of_entity(entity_id)
-        end,
-        after_teleport = function(entity_id, coords, kwargs)
-            return RB_U.request_control_of_entity(entity_id)
-        end
-    })
+    local resu = RB_U.teleport(player_ped, v3(coords.x, coords.y, coords.z))
+    -- local resu = RB_U.teleport(player_ped, v3(coords.x, coords.y, coords.z), {
+    --     before_teleport = function(entity_id, coords, kwargs)
+    --         return RB_U.request_control_of_entity(entity_id)
+    --     end,
+    --     after_teleport = function(entity_id, coords, kwargs)
+    --         return RB_U.request_control_of_entity(entity_id)
+    --     end
+    -- })
     if not resu then
         RB_U.notify(
             '当前无法控制目标.若目标距离过远请观战后传送,目标距离过远,目标不在载具中,目标有控制防护',
             RB_G.lvl.WRN)
         return
     end
-    -- end
     RB_U.notify('操作完成', RB_G.lvl.SUC)
 end
 
-function _Module.onli_cras(feat, data)
+function _Module.onli_cras(feat, pid)
+    if player.player_id() == pid then
+        RB_U.notify('你正在对自己进行恶意操作!本次操作取消', RB_G.lvl.WRN)
+        return
+    end
     RB_U.notify('开始操作,请稍后', RB_G.lvl.INF)
     RB_U.notify('加载' .. RB_G.cra_typ[feat.value + 1] .. "模块", RB_G.lvl.INF)
-    RB_U["game_crashes_" .. RB_G.cra_typ[feat.value + 1]](data.ply_id)
+    RB_U["game_crashes_" .. RB_G.cra_typ[feat.value + 1]](pid)
     RB_U.notify('操作完成,请耐心等待15秒', RB_G.lvl.SUC)
 end
 

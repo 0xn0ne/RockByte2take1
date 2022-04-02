@@ -96,15 +96,15 @@ for k, v in pairs(paths) do
 end
 
 -- 菜单绑定
-RB_U.menus_add({ -- {'test', '测试菜单', 'action_value_str', RB_G.menu.main.id, RB_H.test},
-{'main', 'RockByte', 'parent', 0}, {'onli', '在线玩家', 'parent', 'main'},
-{'wrld', '世界选项', 'parent', 'main'}, {'tele', '传送选项', 'parent', 'main'},
-{'stat', '统计选项', 'parent', 'main'}, {'mntr', '作弊监控', 'parent', 'main'},
-{'chat', '聊天选项', 'parent', 'main'}, {'sett', '菜单设置', 'parent', 'main'},
-{'loop', '监控循环', 'toggle', 0, RB_H.loop}})
+-- RB_U.menus_add({{'test', '测试菜单', 'action_value_str', RB_G.menu.main.id, RB_H.test}})
+-- RB_G.menu.test:set_str_data(RB_G.cra_typ)
+
+RB_U.menus_add({{'main', 'RockByte', 'parent', 0}, {'wrld', '世界选项', 'parent', 'main'},
+                {'tele', '传送选项', 'parent', 'main'}, {'stat', '统计选项', 'parent', 'main'},
+                {'mntr', '作弊监控', 'parent', 'main'}, {'chat', '聊天选项', 'parent', 'main'},
+                {'sett', '菜单设置', 'parent', 'main'}, {'loop', '监控循环', 'toggle', 0, RB_H.loop}})
 RB_G.menu.loop.hidden = true
 RB_G.menu.loop.on = true
-RB_G.menu.test:set_str_data(RB_G.cra_typ)
 
 RB_U.menus_add({{'mntr_swtc', '开启监控', 'toggle', 'mntr', RB_H.mntr_swtc},
                 {'mntr_disp', '实时显示', 'toggle', 'mntr', RB_H.mntr_disp},
@@ -210,40 +210,47 @@ RB_U.menus_add({{'heis', '抢劫选项', 'parent', 'main'}, {'heis_part', '公�
 
 RB_U.menus_add({{'sett_save', '保存设置', 'action', 'sett', RB_H.sett_save}})
 
--- RB_G.menu.onli_play = {}
-for ply_i = 0, RB_G.max_player do
-    local p_keys = 'onli_play.player_' .. ply_i
-    RB_U.menus_add({{p_keys, p_keys, 'parent', RB_G.menu.onli.id},
-                    {p_keys .. '.to_perico', '传送佩里科岛', 'action', p_keys, RB_H.onli_2prc},
-                    {p_keys .. '.to_partment', '传送日蚀公寓', 'action', p_keys, RB_H.onli_2par},
-                    {p_keys .. '.teleport2me', '到我面前(目标在载具中有效)', 'action', p_keys,
-                     RB_H.onli_tp2m}, {p_keys .. '.game_crashes', '游戏崩溃', 'action', p_keys, RB_H.onli_cras}})
-    local data = {
-        ply_id = ply_i
-    }
-    RB_U.menus_set_property({{p_keys .. '.to_perico', {
-        threaded = false,
-        data = data
-    }, {p_keys .. '.to_partment', {
-        threaded = false,
-        data = data
-    }}, {p_keys .. '.teleport2me', {
-        threaded = false,
-        data = data
-    }}, {p_keys .. '.game_crashes', {
-        threaded = false,
-        data = data,
-        str_data = RB_G.cra_typ
-    }}}})
-    -- 该函数好像不起作用
-    -- local set_god = menu.add_feature('设置无敌', 'action',
-    --                                  RB_G.menu.onli_play[ply_i].id,
-    --                                  RB_H.onli_set_god)
-    -- -- 该函数好像不起作用
-    -- local teleport2mycar = menu.add_feature('到我车里', 'action',
-    --                                         RB_G.menu.onli_play[ply_i].id,
-    --                                         RB_H.onli_teleport2mycar)
-end
+local pf_id = menu.add_player_feature('RockByte', 'parent', 0).id
+menu.add_player_feature('传送佩里科岛', 'action', pf_id, RB_H.onli_2prc)
+menu.add_player_feature('传送日蚀公寓', 'action', pf_id, RB_H.onli_2par)
+menu.add_player_feature('到我面前(目标在载具中有效)', 'action', pf_id, RB_H.onli_tp2m)
+menu.add_player_feature('游戏崩溃', 'action_value_str', pf_id, RB_H.onli_cras):set_str_data(RB_G.cra_typ)
+
+-- RB_U.menu_add('onli', '在线玩家', 'parent', 'main')
+-- for ply_i = 0, RB_G.max_player do
+--     local p_keys = string.format(RB_G.menu_player_keys, ply_i)
+--     local p_feat_keys = string.format(RB_G.menu_player_feat_keys, ply_i)
+--     RB_U.menus_add({{p_keys, p_keys, 'parent', RB_G.menu.onli.id},
+--                     {p_feat_keys .. '.to_perico', '传送佩里科岛', 'action', p_keys, RB_H.onli_2prc},
+--                     {p_feat_keys .. '.to_partment', '传送日蚀公寓', 'action', p_keys, RB_H.onli_2par},
+--                     {p_feat_keys .. '.teleport2me', '到我面前(目标在载具中有效)', 'action', p_keys,
+--                      RB_H.onli_tp2m}, {p_feat_keys .. '.game_crashes', '游戏崩溃', 'action', p_keys, RB_H.onli_cras}})
+--     local data = {
+--         ply_id = ply_i
+--     }
+--     RB_U.menus_set_property({{p_feat_keys .. '.to_perico', {
+--         threaded = false,
+--         data = data
+--     }, {p_feat_keys .. '.to_partment', {
+--         threaded = false,
+--         data = data
+--     }}, {p_feat_keys .. '.teleport2me', {
+--         threaded = false,
+--         data = data
+--     }}, {p_feat_keys .. '.game_crashes', {
+--         threaded = false,
+--         data = data,
+--         str_data = RB_G.cra_typ
+--     }}}})
+--     -- 该函数好像不起作用
+--     -- local set_god = menu.add_feature('设置无敌', 'action',
+--     --                                  RB_G.menu.onli_play[ply_i].id,
+--     --                                  RB_H.onli_set_god)
+--     -- -- 该函数好像不起作用
+--     -- local teleport2mycar = menu.add_feature('到我车里', 'action',
+--     --                                         RB_G.menu.onli_play[ply_i].id,
+--     --                                         RB_H.onli_teleport2mycar)
+-- end
 
 -- -- 该函数好像不起作用
 -- RB_G.menu.wrld_comb = menu.add_feature('NPC战斗方式', 'value_i',

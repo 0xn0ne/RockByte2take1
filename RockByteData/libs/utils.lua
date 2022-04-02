@@ -8,16 +8,6 @@ local util_bas = require('utils.base')
 local util_str = require('utils.string')
 local util_err = require('utils.error')
 
-function _Module.menu_binding(menus)
-    for _, f_info in pairs(menus) do
-        if #f_info == 5 then
-            RB_G.menu[f_info[1]] = menu.add_feature(f_info[2], f_info[3], f_info[4], f_info[5])
-        else
-            RB_G.menu[f_info[1]] = menu.add_feature(f_info[2], f_info[3], f_info[4])
-        end
-    end
-end
-
 function _Module.menu_get_last_menu(keys, kwargs)
     kwargs = kwargs or {}
     kwargs.is_nil_err = kwargs.is_nil_err or false
@@ -31,11 +21,13 @@ function _Module.menu_get_last_menu(keys, kwargs)
             util_err.value_error('this menu "' .. curr_keys .. '" does not exist')
         end
     end
-    return table.unpack(menus, tbl_keys[#tbl_keys])
+    return table.unpack({menus, tbl_keys[#tbl_keys]})
 end
 
 function _Module.menu_set_property(keys, kwargs)
-    local last_menu, key = _Module.menu_get_last_menu(keys)
+    local last_menu, key = _Module.menu_get_last_menu(keys, {
+        is_nil_err = true
+    })
     for k, v in pairs(kwargs) do
         if k == 'str_data' then
             last_menu[key]:set_str_data(v)
@@ -46,7 +38,9 @@ function _Module.menu_set_property(keys, kwargs)
 end
 
 function _Module.menu_get_id(p_keys)
-    local last_menu, key = _Module.menu_get_last_menu(p_keys)
+    local last_menu, key = _Module.menu_get_last_menu(p_keys, {
+        is_nil_err = true
+    })
     return last_menu[key].id
 end
 
@@ -174,9 +168,9 @@ function _Module.teleport(entity_id, coords, kwargs)
     end
     kwargs.after_teleport = kwargs.after_teleport or function()
     end
-
+    local vehicle_id = 0
     if ped.is_ped_in_any_vehicle(entity_id) and kwargs.with_vehicle then
-        local vehicle_id = ped.get_vehicle_ped_is_using(entity_id)
+        vehicle_id = ped.get_vehicle_ped_is_using(entity_id)
         if vehicle_id > 0 then
             entity_id = vehicle_id
         else
@@ -213,12 +207,18 @@ function _Module.teleport(entity_id, coords, kwargs)
         -- ground_z + 3 是为了防止玩家传送后下沉
         -- 频繁传送，会出现叠高高问题，但是不想改。有时候叠高高也蛮有意思
     end
+    if vehicle_id > 0 then
+        RB_U.request_control_of_entity(entity_id)
+    end
     if kwargs.before_teleport(entity_id, coords, kwargs) == false then
         return false
     end
     entity.set_entity_coords_no_offset(entity_id, coords)
     if kwargs.after_teleport(entity_id, coords, kwargs) == false then
         return false
+    end
+    if vehicle_id > 0 then
+        RB_U.request_control_of_entity(entity_id)
     end
     if kwargs.delay > 0 then
         system.yield(kwargs.delay)
