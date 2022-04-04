@@ -14,7 +14,7 @@
 
 ### 使用说明
 
-1. 下载当前项目 [快捷入口](#https://github.com/0xn0ne/RockByte2take1/releases)
+1. 下载当前项目 [快捷入口](https://github.com/0xn0ne/RockByte2take1/releases)
 2. 将脚本放入 %APPDATA%\PopstarDevs\2Take1Menu\scripts 目录中
 3. 进入游戏加载脚本即可
 
