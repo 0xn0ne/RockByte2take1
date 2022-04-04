@@ -14,7 +14,7 @@ This project is based on some [Keks-menu](https://github.com/kektram/Keks-menu) 
 
 ### Usage
 
-1. Download the current project
+1. Download the current project [Quick Entry](#https://github.com/0xn0ne/RockByte2take1/releases)
 2. Put the script into %APPDATA%\PopstarDevs\2Take1Menu\scripts directory
 3. Start the game and load the script
 
