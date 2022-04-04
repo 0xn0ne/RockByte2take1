@@ -204,8 +204,11 @@ _Module.eve.n2h = {
 
 _Module.cra_typ = {'kek', 'mmt'}
 
-_Module.eve.crs = {
-    kek = {962740265, -1386010354, 2112408256, 677240627}
-}
+_Module.heist = {}
+_Module.heist.cayo = {}
+_Module.heist.cayo.mode = {126823, 131055}
+_Module.heist.cayo.vehicle = {65283, 65413, 65289, 65425, 65313, 65345, 65535}
+
+_Module.eve = {}
 
 return _Module

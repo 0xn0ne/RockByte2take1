@@ -72,8 +72,40 @@ This project is based on some [Keks-menu](https://github.com/kektram/Keks-menu) 
   + Famous Diamond Casino
     + Modify Bonuses
   + Perico Island
-    + Modified Bonuses
-  + Doomsday Heist
-    + Modify Bonuses
+    + Modified Bonus
+    + Mode
+    + Objectives
+    + Secondary Objectives
+    + Approaching vehicles
+    + Weapons
+    + Truck location
+    + Scouting points of interest
+    + All jamming
+    + Write data
+  + Doomsday Hojack
+    + Modify dividends
 + Menu settings
-  + Save Settings
+  + Save settings
+
+# Search Notice
+
+I really did not expect that I bought a 2T was cheated, take the monthly card to me as a permanent card sold. I was so surprised to see that he was a student and held on to a sliver of trust like a fool. The personal level is limited, can not trace to this person real information, if any big brother see request help to find the identity of the scammer.
+
++ Nickname: SuHeyi
++ SCID: 130349842
++ real name: \*柳城 (not sure if the real name)
++ WeChat ID: wxid_5oaz4hf2cbm512
++ WeChat name: 苏河同志
++ Place of origin: Kunming, Yunnan
+
+![images](./images/Screenshot_20220404_205437.jpg)
+![images](./images/Screenshot_20220404_205458.jpg)
+![images](./images/Screenshot_20220404_205542.jpg)
+![images](./images/Screenshot_20220404_205604.jpg)
+![images](./images/Screenshot_20220404_205625.jpg)
+![images](./images/Screenshot_20220404_205641.jpg)
+![images](./images/Screenshot_20220404_205702.jpg)
+![images](./images/Screenshot_20220404_205720.jpg)
+![images](./images/Screenshot_20220404_205736.jpg)
+![images](./images/Screenshot_20220404_205753.jpg)
+![images](./images/Screenshot_20220404_205806.jpg)

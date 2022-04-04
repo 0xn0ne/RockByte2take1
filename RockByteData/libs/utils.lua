@@ -24,7 +24,7 @@ function _Module.menu_get_last_menu(keys, kwargs)
     return table.unpack({menus, tbl_keys[#tbl_keys]})
 end
 
-function _Module.menu_set_property(keys, kwargs)
+function _Module.menu_set(keys, kwargs)
     local last_menu, key = _Module.menu_get_last_menu(keys, {
         is_nil_err = true
     })
@@ -35,6 +35,13 @@ function _Module.menu_set_property(keys, kwargs)
             last_menu[key][k] = v
         end
     end
+end
+
+function _Module.menu_get(keys)
+    local last_menu, key = _Module.menu_get_last_menu(keys, {
+        is_nil_err = true
+    })
+    return last_menu[key]
 end
 
 function _Module.menu_get_id(p_keys)
@@ -57,14 +64,16 @@ function _Module.menu_add(keys, name, t_feat, p_keys, func)
     last_menu[key] = menu.add_feature(name, t_feat, p_id, func)
 end
 
-function _Module.menus_set_property(tbl_menus_property)
-    for _, properties in pairs(tbl_menus_property) do
-        _Module.menu_set_property(properties[1], properties[2])
+function _Module.menus_set(...)
+    local tbls = {...}
+    for _, properties in pairs(tbls) do
+        _Module.menu_set(properties[1], properties[2])
     end
 end
 
-function _Module.menus_add(tbl_menus)
-    for _, f_info in pairs(tbl_menus) do
+function _Module.menus_add(...)
+    local tbls = {...}
+    for _, f_info in pairs(tbls) do
         local func = #f_info > 4 and f_info[5] or nil
         _Module.menu_add(f_info[1], f_info[2], f_info[3], f_info[4], func)
     end
@@ -208,7 +217,7 @@ function _Module.teleport(entity_id, coords, kwargs)
         -- 频繁传送，会出现叠高高问题，但是不想改。有时候叠高高也蛮有意思
     end
     if vehicle_id > 0 then
-        RB_U.request_control_of_entity(entity_id)
+        _Module.request_control_of_entity(entity_id)
     end
     if kwargs.before_teleport(entity_id, coords, kwargs) == false then
         return false
@@ -218,7 +227,7 @@ function _Module.teleport(entity_id, coords, kwargs)
         return false
     end
     if vehicle_id > 0 then
-        RB_U.request_control_of_entity(entity_id)
+        _Module.request_control_of_entity(entity_id)
     end
     if kwargs.delay > 0 then
         system.yield(kwargs.delay)
@@ -409,7 +418,6 @@ function _Module.send_script_event_by_name(name, player_id, script_args, kwargs)
 end
 
 function _Module.game_crashes_mmt(target_pid)
-    _Module.notify('MMT型崩溃即将启动, 请远离目标对象500距离以上, 否则会被影响到', RB_G.lvl.INF)
     local self_player = {
         id = player.player_id()
     }
@@ -420,6 +428,10 @@ function _Module.game_crashes_mmt(target_pid)
     }
     targ_player.ped = player.get_player_ped(targ_player.id)
     targ_player.coords = player.get_player_coords(targ_player.id)
+    if util_bas.calc_distance(self_player.coords, targ_player.coords) < 250 then
+        _Module.notify('与目标玩家距离小于250取消操作', RB_G.lvl.WRN)
+        return false
+    end
 
     local towtruck = _Module.gen_vehicle(-1323100960, targ_player.coords, 0)
     local tractor = _Module.gen_vehicle(-1323100960, targ_player.coords, 0)
@@ -456,6 +468,7 @@ function _Module.game_crashes_mmt(target_pid)
     network.force_remove_player(targ_player.id)
 
     -- _Module.teleport(self_player.ped, self_player.coords)
+    return true
 end
 
 function _Module.game_crashes_kek(target_pid)
@@ -474,6 +487,7 @@ function _Module.game_crashes_kek(target_pid)
         end
         _Module.send_script_event(script_hash, target_pid, parameters)
     end
+    return true
 end
 
 function _Module.get_all_attached_entities(entity_id, entities)
@@ -607,8 +621,10 @@ function _Module.get_mp_index()
     return stats.stat_get_int(gameplay.get_hash_key("MPPLY_LAST_MP_CHAR"), 0)
 end
 function _Module.get_stat_hash(stat_name, kwargs)
-    assert(stat_name ~= '', 'the value of "stat_name" is null.')
     kwargs = kwargs or {}
+    if type(stat_name) == 'number' then
+        return stat_name
+    end
     if kwargs.is_mp == nil then
         kwargs.is_mp = true
     end
@@ -616,7 +632,7 @@ function _Module.get_stat_hash(stat_name, kwargs)
         stat_name = string.format('MP%d_%s', _Module.get_mp_index(), stat_name)
     end
     local ret = gameplay.get_hash_key(stat_name)
-    assert(hash ~= 0, string.format('The hash value of "%s" does not exist', kwargs.name))
+    assert(ret ~= 0, string.format('The hash value of "%s" does not exist', kwargs.name))
     return ret
 end
 function _Module.control_stats(control_func, kwargs)
@@ -627,20 +643,48 @@ function _Module.control_stats(control_func, kwargs)
         return
     end
     kwargs.hash = _Module.get_stat_hash
-    kwargs.get_int = stats.stat_get_int
-    kwargs.set_int = stats.stat_set_int
-    kwargs.get_float = stats.stat_get_float
-    kwargs.set_float = stats.stat_set_float
-    kwargs.get_bool = stats.stat_get_bool
-    kwargs.set_bool = stats.stat_set_bool
-    kwargs.get_i64 = stats.stat_get_i64
-    kwargs.set_i64 = stats.stat_set_i64
-    kwargs.get_u64 = stats.stat_get_u64
-    kwargs.set_u64 = stats.stat_set_u64
-    kwargs.get_masked_int = stats.stat_get_masked_int
-    kwargs.set_masked_int = stats.stat_set_masked_int
-    kwargs.get_masked_bool = stats.stat_get_masked_bool
-    kwargs.set_masked_bool = stats.stat_set_masked_bool
+    kwargs.get_int = function(h_key, ...)
+        return stats.stat_get_int(_Module.get_stat_hash(h_key), ...)
+    end
+    kwargs.set_int = function(h_key, ...)
+        return stats.stat_set_int(_Module.get_stat_hash(h_key), ...)
+    end
+    kwargs.get_float = function(h_key, ...)
+        return stats.stat_get_float(_Module.get_stat_hash(h_key), ...)
+    end
+    kwargs.set_float = function(h_key, ...)
+        return stats.stat_set_float(_Module.get_stat_hash(h_key), ...)
+    end
+    kwargs.get_bool = function(h_key, ...)
+        return stats.stat_get_bool(_Module.get_stat_hash(h_key), ...)
+    end
+    kwargs.set_bool = function(h_key, ...)
+        return stats.stat_set_bool(_Module.get_stat_hash(h_key), ...)
+    end
+    kwargs.get_i64 = function(h_key, ...)
+        return stats.stat_get_i64(_Module.get_stat_hash(h_key), ...)
+    end
+    kwargs.set_i64 = function(h_key, ...)
+        return stats.stat_set_i64(_Module.get_stat_hash(h_key), ...)
+    end
+    kwargs.get_u64 = function(h_key, ...)
+        return stats.stat_get_u64(_Module.get_stat_hash(h_key), ...)
+    end
+    kwargs.set_u64 = function(h_key, ...)
+        return stats.stat_set_u64(_Module.get_stat_hash(h_key), ...)
+    end
+    kwargs.get_masked_int = function(h_key, ...)
+        return stats.stat_get_masked_int(_Module.get_stat_hash(h_key), ...)
+    end
+    kwargs.set_masked_int = function(h_key, ...)
+        return stats.stat_set_masked_int(_Module.get_stat_hash(h_key), ...)
+    end
+    kwargs.get_masked_bool = function(h_key, ...)
+        return stats.stat_get_masked_bool(_Module.get_stat_hash(h_key), ...)
+    end
+    kwargs.set_masked_bool = function(h_key, ...)
+        return stats.stat_set_masked_bool(_Module.get_stat_hash(h_key), ...)
+    end
     kwargs.get_bool_hash_and_mask = stats.stat_get_bool_hash_and_mask
     kwargs.get_int_hash_and_mask = stats.stat_get_int_hash_and_mask
     local ret = control_func(kwargs)

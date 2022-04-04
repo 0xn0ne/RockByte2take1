@@ -11,30 +11,6 @@ local util_str = require('utils.string')
 local util_log = require('utils.logger')
 local util_tim = require('utils.time')
 
-function _Module.test(feat)
-    -- print("[DBG]", feat.value, unpack({1000, true, "nihao"}))
-    RB_U.notify('测试中', RB_G.lvl.INF)
-    print('------')
-    local uni_tbl = {}
-    RB_U.control_npcs(function(data)
-        local hash = ped.get_ped_relationship_group_hash(data.ped.id)
-        local key = string.format('0x%08x | %010d', hash, hash)
-        if not uni_tbl[key] then
-            uni_tbl[key] = 0
-        end
-        uni_tbl[key] = uni_tbl[key] + 1
-    end, {
-        include_player = true
-    })
-
-    RB_U.notify('加载' .. RB_G.cra_typ[feat.value + 1] .. "", RB_G.lvl.INF)
-    RB_U.notify('TEST MESSAGE CONTENT, RED NOTIFY', RB_G.lvl.ERR)
-    RB_U.notify('TEST MESSAGE CONTENT, YELLOW NOTIFY', RB_G.lvl.WRN)
-    RB_U.notify('TEST MESSAGE CONTENT, GREEN NOTIFY', RB_G.lvl.SUC)
-    RB_U.notify('TEST MESSAGE CONTENT, BLUE NOTIFY', RB_G.lvl.INF)
-    RB_U.notify('TEST MESSAGE CONTENT, PURPLE NOTIFY', RB_G.lvl.DBG)
-end
-
 function _Module.loop(feat)
     if not feat.on then
         return
@@ -49,21 +25,19 @@ function _Module.loop(feat)
         ply_info.mod = RB_U.get_player_info_modder(ply_i)
         local old_ply_info = RB_G.ply.inf[ply_info.name]
         if ply_i == player.player_id() or ply_info.scid <= 0 then
-            -- RB_U.menu_set_property(string.format(RB_G.menu_player_keys, ply_i), {
+            -- RB_U.menu_set(string.format(RB_G.menu_player_keys, ply_i), {
             --     hidden = true
             -- })
             goto continue
         end
-        -- RB_U.menu_set_property(string.format(RB_G.menu_player_keys, ply_i), {
-        --     hidden = false
-        -- })
 
         RB_G.ply.inf[ply_info.name] = ply_info
         RB_G.ply.onl[ply_info.name] = ply_i
-        -- RB_U.menu_set_property(string.format(RB_G.menu_player_keys, ply_i), {
+        local ply_name = ply_info.name
+        -- RB_U.menu_set(string.format(RB_G.menu_player_keys, ply_i), {
+        --     hidden = false
         --     name = ply_info.name
         -- })
-        local ply_name = player.get_player_name(ply_i)
 
         if not RB_G.cfgs:get('MNTR', 'modder_monitor_enable') then
             goto continue
@@ -188,87 +162,12 @@ function _Module.onli_cras(feat, pid)
         RB_U.notify('你正在对自己进行恶意操作!本次操作取消', RB_G.lvl.WRN)
         return
     end
-    RB_U.notify('开始操作,请稍后', RB_G.lvl.INF)
     RB_U.notify('加载' .. RB_G.cra_typ[feat.value + 1] .. "模块", RB_G.lvl.INF)
-    RB_U["game_crashes_" .. RB_G.cra_typ[feat.value + 1]](pid)
+    if not RB_U["game_crashes_" .. RB_G.cra_typ[feat.value + 1]](pid) then
+        return
+    end
     RB_U.notify('操作完成,请耐心等待15秒', RB_G.lvl.SUC)
 end
-
--- -- 原版鬼崩，使用后重启脚本、切换战局自己也会崩溃
--- function _Module.onli_cras(feat, data)
---     RB_U.notify('开始操作,请稍后', RB_G.lvl.INF)
---     local self_player = {id = player.player_id()}
---     self_player.ped = player.get_player_ped(self_player.id)
---     self_player.coords = player.get_player_coords(self_player.id)
---     local targ_player = {id = data.ply_id}
---     targ_player.ped = player.get_player_ped(targ_player.id)
---     targ_player.coords = player.get_player_coords(targ_player.id)
-
---     if not RB_U.request_model(1784254509) then
---         RB_U.notify('操作失败!请稍后重试', RB_G.lvl.WRN)
---     end
---     local vehicle_id = vehicle.create_vehicle(1784254509, self_player.coords, 1,
---                                               true, false)
---     -- streaming.set_model_as_no_longer_needed(1784254509)
---     network.has_control_of_entity(vehicle_id)
---     entity.set_entity_visible(vehicle_id, false)
---     entity.set_entity_god_mode(vehicle_id, true)
---     network.request_control_of_entity(vehicle_id)
---     entity.attach_entity_to_entity(vehicle_id, self_player.ped, 0,
---                                    v3(0, 0, -10), v3(0.0, 0, 0.0), true, false,
---                                    false, 0, true)
---     system.wait(300)
-
---     for i = 1, 30 do
---         targ_player.coords = player.get_player_coords(targ_player.id)
---         targ_player.coords.z = targ_player.coords.z - 10
---         entity.set_entity_coords_no_offset(self_player.ped, targ_player.coords)
---         system.wait(50)
---     end
---     entity.set_entity_coords_no_offset(
---         player.get_player_ped(player.player_id()), self_player.coords)
-
---     RB_U.notify('操作完成,稍等10秒目标游戏将崩溃', RB_G.lvl.SUC)
--- end
-
--- 好像没用
--- function _Module.onli_set_god(feat, data)
---     RB_U.notify('开始操作,请稍后', RB_G.lvl.INF)
---     local player_ped = player.get_player_ped(data.ply_id)
---     if not RB_U.request_control_of_entity(player_ped) then
---         RB_U.notify('当前无法控制目标', RB_G.lvl.WRN)
---         return
---     end
---     entity.set_entity_god_mode(player_ped, true)
---     if not RB_U.request_control_of_entity(player_ped) then
---         RB_U.notify('操作失败', RB_G.lvl.WRN)
---         return
---     end
---     RB_U.notify('操作完成', RB_G.lvl.SUC)
--- end
-
--- 好像没用
--- function _Module.onli_teleport2mycar(feat, data)
---     local player_ped = player.get_player_ped(data.ply_id)
---     if not network.request_control_of_entity(player_ped) then
---         RB_U.notify('当前无法控制目标', RB_G.lvl.WRN)
---         return
---     end
---     local self_ped_id = player.get_player_ped(player.player_id())
---     if not ped.is_ped_in_any_vehicle(self_ped_id) then
---         RB_U.notify('请坐上车后再尝试', RB_G.lvl.WRN)
---         return
---     end
---     local vehicle_id = ped.get_vehicle_ped_is_using(self_ped_id)
---     if not vehicle.is_vehicle_full(vehicle_id) then
---         RB_U.notify('车辆已满员', RB_G.lvl.WRN)
---         return
---     end
---     network.request_control_of_entity(vehicle_id)
---     ped.set_ped_into_vehicle(player_ped, vehicle_id,
---                              vehicle.get_free_seat(vehicle_id))
---     RB_U.notify('操作完成', RB_G.lvl.SUC)
--- end
 
 function _Module.mntr_swtc(feat)
     RB_G.cfgs:set('MNTR', 'modder_monitor_enable', feat.on)
@@ -453,31 +352,6 @@ function _Module.wrld_objs_tele(feat)
     return HANDLER_CONTINUE
 end
 
--- function _Module.wrld_comb(feat)
---     -- 设置NPC战斗方式，没作用
---     RB_G.cfgs:set('WRLD', 'combat_ability', feat.value)
---     RB_G.cfgs:set('WRLD', 'combat_ability_on', feat.on)
---     if not RB_G.cfgs:get('WRLD', 'combat_ability_on') then return end
---     RB_U.control_npcs(function(ped_idx, ped_id)
---         ped.set_ped_combat_ability(ped_id,
---                                    RB_G.cfgs:get('WRLD', 'combat_ability'))
---     end)
---     system.yield(100)
---     return HANDLER_CONTINUE
--- end
-
--- function _Module.wrld_accu(feat)
---     -- 设置NPC精准度，但好像没作用
---     RB_G.cfgs:set('WRLD', 'accuracy', feat.value)
---     RB_G.cfgs:set('WRLD', 'accuracy_on', feat.on)
---     if not RB_G.cfgs:get('WRLD', 'accuracy_on') then return end
---     RB_U.control_npcs(function(ped_idx, ped_id)
---         ped.set_ped_accuracy(ped_id, RB_G.cfgs:get('WRLD', 'accuracy'))
---     end)
---     system.yield(100)
---     return HANDLER_CONTINUE
--- end
-
 function _Module.stat_addt(feat)
     if feat.value == 0 then
         RB_U.notify(
@@ -498,8 +372,8 @@ function _Module.stat_addt(feat)
         args.set_u64(args.hash('MP_PLAYING_TIME', {
             is_mp = false
         }), playing_ms, 1)
-        mp_total_ms = args.get_u64(args.hash('TOTAL_PLAYING_TIME')) + time_ms[feat.value]
-        args.set_u64(args.hash('TOTAL_PLAYING_TIME'), mp_total_ms, 1)
+        mp_total_ms = args.get_u64('TOTAL_PLAYING_TIME') + time_ms[feat.value]
+        args.set_u64('TOTAL_PLAYING_TIME', mp_total_ms, 1)
         return true
     end) then
         return
@@ -540,8 +414,8 @@ function _Module.stat_rdct(feat)
         args.set_u64(args.hash('MP_PLAYING_TIME', {
             is_mp = false
         }), playing_ms, 1)
-        mp_total_ms = args.get_u64(args.hash('TOTAL_PLAYING_TIME')) - time_ms[feat.value]
-        args.set_u64(args.hash('TOTAL_PLAYING_TIME'), mp_total_ms, 1)
+        mp_total_ms = args.get_u64('TOTAL_PLAYING_TIME') - time_ms[feat.value]
+        args.set_u64('TOTAL_PLAYING_TIME', mp_total_ms, 1)
         return true
     end) then
         return
@@ -643,7 +517,7 @@ function _Module.char_judg_keys_hand(feat)
     _Module.refresh_chat_judge_keywords()
 end
 
-function _Module.heis_part_paym(feat)
+function _Module.heist_apartment_cut(feat)
     local respone, data = nil, nil
     while true do
         respone, data = input.get('输入分红百分比', '85', 10, 0)
@@ -659,7 +533,7 @@ function _Module.heis_part_paym(feat)
     script.set_global_i(1934631 + 3008 + 1, payment)
 end
 
-function _Module.heis_diam_paym(feat)
+function _Module.heist_casino_cut(feat)
     local respone, data = nil, nil
     while true do
         respone, data = input.get('输入分红百分比', '85', 10, 0)
@@ -677,7 +551,7 @@ function _Module.heis_diam_paym(feat)
     end
 end
 
-function _Module.heis_peri_paym(feat)
+function _Module.heist_cayo_cut(feat)
     local respone, data = nil, nil
     while true do
         respone, data = input.get('输入分红百分比', '85', 10, 0)
@@ -695,7 +569,7 @@ function _Module.heis_peri_paym(feat)
     end
 end
 
-function _Module.heis_doom_paym(feat)
+function _Module.heist_doomsday_cut(feat)
     local respone, data = nil, nil
     while true do
         respone, data = input.get('输入分红百分比', '85', 10, 0)
@@ -729,10 +603,206 @@ function _Module.refresh_chat_judge_keywords()
     end
 end
 
+function _Module.heist_cayo_mode(feat)
+    RB_G.cfgs:set('HEIST', 'heist_cayo_mode', feat.value)
+    RB_G.cfgs:set('HEIST', 'heist_cayo_mode_on', feat.on)
+end
+
+function _Module.heist_cayo_target(feat)
+    RB_G.cfgs:set('HEIST', 'heist_cayo_target', feat.value)
+    RB_G.cfgs:set('HEIST', 'heist_cayo_target_on', feat.on)
+end
+
+function _Module.heist_cayo_second(feat)
+    RB_G.cfgs:set('HEIST', 'heist_cayo_second', feat.value)
+    RB_G.cfgs:set('HEIST', 'heist_cayo_second_on', feat.on)
+end
+
+function _Module.heist_cayo_vehicle(feat)
+    RB_G.cfgs:set('HEIST', 'heist_cayo_vehicle', feat.value)
+    RB_G.cfgs:set('HEIST', 'heist_cayo_vehicle_on', feat.on)
+end
+
+function _Module.heist_cayo_weapon(feat)
+    RB_G.cfgs:set('HEIST', 'heist_cayo_weapon', feat.value)
+    RB_G.cfgs:set('HEIST', 'heist_cayo_weapon_on', feat.on)
+end
+
+function _Module.heist_cayo_truck(feat)
+    RB_G.cfgs:set('HEIST', 'heist_cayo_truck', feat.value)
+    RB_G.cfgs:set('HEIST', 'heist_cayo_truck_on', feat.on)
+end
+
+function _Module.heist_cayo_disturb(feat)
+    RB_G.cfgs:set('HEIST', 'heist_cayo_disturb_on', feat.on)
+end
+
+function _Module.heist_cayo_interest(feat)
+    RB_G.cfgs:set('HEIST', 'heist_cayo_interest_on', feat.on)
+end
+
+function _Module.heist_cayo_enable(feat)
+    if RB_G.cfgs:get('heist_cayo_mode_on') then
+        RB_U.control_stats(function(args)
+            local value = RB_G.heist.cayo.mode[RB_U.menu_get('heist_cayo_mode').value + 1]
+            return args.set_int('H4_PROGRESS', value, true)
+        end)
+    end
+    if RB_G.cfgs:get('heist_cayo_target_on') then
+        RB_U.control_stats(function(args)
+            return args.set_int('H4CNF_TARGET', RB_U.menu_get('heist_cayo_target').value, true)
+        end)
+    end
+    if RB_G.cfgs:get('heist_cayo_second_on') then
+        -- 豪宅外最大放置情况：16777215 -> 111111111111111111111111
+        -- 豪宅内最大放置情况：255 -> 11111111
+        -- 豪宅内画作最大放置情况：127 -> 1111111
+        -- 豪宅外正常放置个数：8-16
+        -- 豪宅内正常放置个数：3-6
+        -- 豪宅内正常画作个数：2-4
+        -- 说明：-1解锁所有点位
+        -- RB_U.control_stats(function(args)
+        --     return args.set_int('H4CNF_TARGET', RB_U.menu_get('heist_cayo_second').value, true)
+        -- end)
+    end
+    if RB_G.cfgs:get('heist_cayo_vehicle_on') then
+        RB_U.control_stats(function(args)
+            local value = RB_G.heist.cayo.mode[RB_U.menu_get('heist_cayo_vehicle').value + 1]
+            return args.set_int('H4_MISSIONS', value, true)
+        end)
+    end
+    if RB_G.cfgs:get('heist_cayo_weapon_on') then
+        RB_U.control_stats(function(args)
+            return args.set_int('H4CNF_WEAPONS', RB_U.menu_get('heist_cayo_weapon').value + 1, true)
+        end)
+    end
+    if RB_G.cfgs:get('heist_cayo_truck_on') then
+        RB_U.control_stats(function(args)
+            return args.set_int('H4CNF_TROJAN', RB_U.menu_get('heist_cayo_truck').value + 1, true)
+        end)
+    end
+    if RB_G.cfgs:get('heist_cayo_disturb_on') then
+        RB_U.control_stats(function(args)
+            args.set_int('H4CNF_WEP_DISRP', 3, true)
+            args.set_int('H4CNF_ARM_DISRP', 3, true)
+            args.set_int('H4CNF_HEL_DISRP', 3, true)
+        end)
+    end
+    if RB_G.cfgs:get('heist_cayo_interest_on') then
+        RB_U.control_stats(function(args)
+            args.set_int('H4CNF_GRAPPEL', -1, true)
+            args.set_int('H4CNF_UNIFORM', -1, true)
+            args.set_int('H4CNF_BOLTCUT', -1, true)
+        end)
+    end
+    RB_U.notify('操作成功，如果控制面板未刷新请重新进入虎鲸', RB_G.lvl.SUC)
+end
+
 function _Module.sett_save(feat)
     RB_G.cfgs:set('CHAR', 'chat_judge_keywords', table.concat(RB_G.jud_kws, ', '))
     RB_G.cfgs:save()
     RB_U.notify('设置保存成功', RB_G.lvl.SUC)
 end
+
+-- -- 原版鬼崩，使用后重启脚本、切换战局自己也会崩溃
+-- function _Module.onli_cras(feat, data)
+--     RB_U.notify('开始操作,请稍后', RB_G.lvl.INF)
+--     local self_player = {id = player.player_id()}
+--     self_player.ped = player.get_player_ped(self_player.id)
+--     self_player.coords = player.get_player_coords(self_player.id)
+--     local targ_player = {id = data.ply_id}
+--     targ_player.ped = player.get_player_ped(targ_player.id)
+--     targ_player.coords = player.get_player_coords(targ_player.id)
+
+--     if not RB_U.request_model(1784254509) then
+--         RB_U.notify('操作失败!请稍后重试', RB_G.lvl.WRN)
+--     end
+--     local vehicle_id = vehicle.create_vehicle(1784254509, self_player.coords, 1,
+--                                               true, false)
+--     -- streaming.set_model_as_no_longer_needed(1784254509)
+--     network.has_control_of_entity(vehicle_id)
+--     entity.set_entity_visible(vehicle_id, false)
+--     entity.set_entity_god_mode(vehicle_id, true)
+--     network.request_control_of_entity(vehicle_id)
+--     entity.attach_entity_to_entity(vehicle_id, self_player.ped, 0,
+--                                    v3(0, 0, -10), v3(0.0, 0, 0.0), true, false,
+--                                    false, 0, true)
+--     system.wait(300)
+
+--     for i = 1, 30 do
+--         targ_player.coords = player.get_player_coords(targ_player.id)
+--         targ_player.coords.z = targ_player.coords.z - 10
+--         entity.set_entity_coords_no_offset(self_player.ped, targ_player.coords)
+--         system.wait(50)
+--     end
+--     entity.set_entity_coords_no_offset(
+--         player.get_player_ped(player.player_id()), self_player.coords)
+
+--     RB_U.notify('操作完成,稍等10秒目标游戏将崩溃', RB_G.lvl.SUC)
+-- end
+
+-- 好像没用
+-- function _Module.onli_set_god(feat, data)
+--     RB_U.notify('开始操作,请稍后', RB_G.lvl.INF)
+--     local player_ped = player.get_player_ped(data.ply_id)
+--     if not RB_U.request_control_of_entity(player_ped) then
+--         RB_U.notify('当前无法控制目标', RB_G.lvl.WRN)
+--         return
+--     end
+--     entity.set_entity_god_mode(player_ped, true)
+--     if not RB_U.request_control_of_entity(player_ped) then
+--         RB_U.notify('操作失败', RB_G.lvl.WRN)
+--         return
+--     end
+--     RB_U.notify('操作完成', RB_G.lvl.SUC)
+-- end
+
+-- 好像没用
+-- function _Module.onli_teleport2mycar(feat, data)
+--     local player_ped = player.get_player_ped(data.ply_id)
+--     if not network.request_control_of_entity(player_ped) then
+--         RB_U.notify('当前无法控制目标', RB_G.lvl.WRN)
+--         return
+--     end
+--     local self_ped_id = player.get_player_ped(player.player_id())
+--     if not ped.is_ped_in_any_vehicle(self_ped_id) then
+--         RB_U.notify('请坐上车后再尝试', RB_G.lvl.WRN)
+--         return
+--     end
+--     local vehicle_id = ped.get_vehicle_ped_is_using(self_ped_id)
+--     if not vehicle.is_vehicle_full(vehicle_id) then
+--         RB_U.notify('车辆已满员', RB_G.lvl.WRN)
+--         return
+--     end
+--     network.request_control_of_entity(vehicle_id)
+--     ped.set_ped_into_vehicle(player_ped, vehicle_id,
+--                              vehicle.get_free_seat(vehicle_id))
+--     RB_U.notify('操作完成', RB_G.lvl.SUC)
+-- end
+
+-- function _Module.wrld_comb(feat)
+--     -- 设置NPC战斗方式，没作用
+--     RB_G.cfgs:set('WRLD', 'combat_ability', feat.value)
+--     RB_G.cfgs:set('WRLD', 'combat_ability_on', feat.on)
+--     if not RB_G.cfgs:get('WRLD', 'combat_ability_on') then return end
+--     RB_U.control_npcs(function(ped_idx, ped_id)
+--         ped.set_ped_combat_ability(ped_id,
+--                                    RB_G.cfgs:get('WRLD', 'combat_ability'))
+--     end)
+--     system.yield(100)
+--     return HANDLER_CONTINUE
+-- end
+
+-- function _Module.wrld_accu(feat)
+--     -- 设置NPC精准度，但好像没作用
+--     RB_G.cfgs:set('WRLD', 'accuracy', feat.value)
+--     RB_G.cfgs:set('WRLD', 'accuracy_on', feat.on)
+--     if not RB_G.cfgs:get('WRLD', 'accuracy_on') then return end
+--     RB_U.control_npcs(function(ped_idx, ped_id)
+--         ped.set_ped_accuracy(ped_id, RB_G.cfgs:get('WRLD', 'accuracy'))
+--     end)
+--     system.yield(100)
+--     return HANDLER_CONTINUE
+-- end
 
 return _Module

@@ -2,7 +2,7 @@
 
 简体中文 | [English](./README_EN.md)
 
-为 2take1 用户开发的一个 lua 脚本，主要目标是提供快捷任务、提升公共战局体验
+为 2take1 用户开发的一个 lua 脚本，主要目标是提供快捷任务、提升公共战局体验。主要是其它卖钱的脚本写得实在是太烂了，传送遁地，崩人自崩，乱七八糟的恶搞功能，代码结构太差。所以才有了这个脚本。
 
 本项目参考了一些 [Keks-menu](https://github.com/kektram/Keks-menu) 的写法和用法。
 
@@ -19,8 +19,6 @@
 3. 进入游戏加载脚本即可
 
 # 运行样例
-
-![images-01](./images/images-01.png)
 
 ### 功能预览
 
@@ -73,7 +71,39 @@
     + 修改分红
   + 佩里科岛
     + 修改分红
+    + 模式
+    + 目标
+    + 次要目标
+    + 接近载具
+    + 武器
+    + 卡车位置
+    + 侦察兴趣点
+    + 全部干扰
+    + 写入数据
   + 末日豪劫
     + 修改分红
 + 菜单设置
   + 保存设置
+
+# 寻人启事
+
+我真的没想到，我买个2T被骗了，拿月卡给我当永久卡卖。偏偏还看他是学生，像傻子一样抱着一丝信任。个人水平有限，没法溯源到这个人真实信息，如果有大佬看到请求帮忙找到骗子身份。
+
++ 游戏名：SuHeyi
++ SCID：130349842
++ 部分实名：\*柳城（不确定是否真实名字）
++ 微信号：wxid_5oaz4hf2cbm512
++ 微信名：苏河同志
++ 籍贯：云南昆明人
+
+![images](./images/Screenshot_20220404_205437.jpg)
+![images](./images/Screenshot_20220404_205458.jpg)
+![images](./images/Screenshot_20220404_205542.jpg)
+![images](./images/Screenshot_20220404_205604.jpg)
+![images](./images/Screenshot_20220404_205625.jpg)
+![images](./images/Screenshot_20220404_205641.jpg)
+![images](./images/Screenshot_20220404_205702.jpg)
+![images](./images/Screenshot_20220404_205720.jpg)
+![images](./images/Screenshot_20220404_205736.jpg)
+![images](./images/Screenshot_20220404_205753.jpg)
+![images](./images/Screenshot_20220404_205806.jpg)

@@ -37,6 +37,7 @@ end
 local util_ini = nil
 local util_bas = nil
 local util_str = nil
+local util_num = nil
 local RB_G = nil
 local RB_U = nil
 local RB_H = nil
@@ -60,6 +61,7 @@ do -- 确保每个被加载一次，每次需要一个库时，都有与其他�
     util_bas = require('utils.base')
     util_ini = require('utils.ini')
     util_str = require('utils.string')
+    util_num = require('utils.number')
     RB_G = require('libs.global')
     RB_U = require('libs.utils')
     RB_H = require('libs.handlers')
@@ -79,7 +81,14 @@ for _, val in ipairs({{'PROG', 'debug', false}, {'TELE', 'flash_distance', 3}, {
                       {'WRLD', 'combat_ability', 0}, {'WRLD', 'combat_ability_on', false},
                       {'WRLD', 'control_range', 100}, {'WRLD', 'objects_teleport', false},
                       {'CHAR', 'chat_judge_notice', true}, {'CHAR', 'chat_judge_type', 0},
-                      {'CHAR', 'chat_judge_keywords', 'www%., GTA%d%d%d, 刷金, q群, 售后, 微信, 淘宝, vx'}}) do
+                      {'CHAR', 'chat_judge_keywords', 'www%., GTA%d%d%d, 刷金, q群, 售后, 微信, 淘宝, vx'},
+                      {'HEIST', 'heist_cayo_mode', 0}, {'HEIST', 'heist_cayo_mode_on', false},
+                      {'HEIST', 'heist_cayo_target', 0}, {'HEIST', 'heist_cayo_target_on', false},
+                      {'HEIST', 'heist_cayo_second', 0}, {'HEIST', 'heist_cayo_second_on', false},
+                      {'HEIST', 'heist_cayo_vehicle', 0}, {'HEIST', 'heist_cayo_vehicle_on', false},
+                      {'HEIST', 'heist_cayo_weapon', 0}, {'HEIST', 'heist_cayo_weapon_on', false},
+                      {'HEIST', 'heist_cayo_truck', 0}, {'HEIST', 'heist_cayo_truck_on', false},
+                      {'HEIST', 'heist_cayo_disturb_on', false}, {'HEIST', 'heist_cayo_interest_on', false}}) do
     if RB_G.cfgs:get(val[1], val[2]) == nil then
         RB_G.cfgs:set(val[1], val[2], val[3])
     end
@@ -96,27 +105,53 @@ for k, v in pairs(paths) do
 end
 
 -- 菜单绑定
--- RB_U.menus_add({{'test', '测试菜单', 'action_value_str', RB_G.menu.main.id, RB_H.test}})
--- RB_G.menu.test:set_str_data(RB_G.cra_typ)
-
-RB_U.menus_add({{'main', 'RockByte', 'parent', 0}, {'wrld', '世界选项', 'parent', 'main'},
-                {'tele', '传送选项', 'parent', 'main'}, {'stat', '统计选项', 'parent', 'main'},
-                {'mntr', '作弊监控', 'parent', 'main'}, {'chat', '聊天选项', 'parent', 'main'},
-                {'sett', '菜单设置', 'parent', 'main'}, {'loop', '监控循环', 'toggle', 0, RB_H.loop}})
+RB_U.menus_add({'main', 'RockByte', 'parent', 0}, {'loop', '监控循环', 'toggle', 0, RB_H.loop})
 RB_G.menu.loop.hidden = true
 RB_G.menu.loop.on = true
 
-RB_U.menus_add({{'mntr_swtc', '开启监控', 'toggle', 'mntr', RB_H.mntr_swtc},
-                {'mntr_disp', '实时显示', 'toggle', 'mntr', RB_H.mntr_disp},
-                {'mntr_mlog', '记录日志', 'toggle', 'mntr', RB_H.mntr_mlog},
-                {'mntr_coln', '每行玩家个数', 'autoaction_value_i', 'mntr', RB_H.mntr_coln},
-                {'mntr_size', '字体大小', 'autoaction_value_i', 'mntr', RB_H.mntr_size},
-                {'mntr_heig', '行高倍数', 'autoaction_value_f', 'mntr', RB_H.mntr_heig},
-                {'mntr_red', 'RD', 'autoaction_value_i', 'mntr', RB_H.mntr_red},
-                {'mntr_gren', 'GN', 'autoaction_value_i', 'mntr', RB_H.mntr_gren},
-                {'mntr_blue', 'BU', 'autoaction_value_i', 'mntr', RB_H.mntr_blue},
-                {'mntr_alph', '不透明度', 'autoaction_value_i', 'mntr', RB_H.mntr_alph},
-                {'mntr_slep', '检测间隔ms', 'autoaction_value_i', 'mntr', RB_H.mntr_slep}})
+RB_U.menus_add({'test', '测试菜单', 'action', RB_G.menu.main.id, function(feat)
+    RB_U.notify('测试中', RB_G.lvl.INF)
+
+    RB_U.control_stats(function(args)
+        util_num.to_bin(args.get_int('H4LOOT_CASH_I', 0))
+        util_bas.print('I', util_num.to_bin(args.get_int('H4LOOT_CASH_I', 0)),
+            util_num.to_bin(args.get_int('H4LOOT_WEED_I', 0)), util_num.to_bin(args.get_int('H4LOOT_COKE_I', 0)),
+            util_num.to_bin(args.get_int('H4LOOT_GOLD_I', 0)))
+        util_bas.print('C', util_num.to_bin(args.get_int('H4LOOT_CASH_C', 0)),
+            util_num.to_bin(args.get_int('H4LOOT_WEED_C', 0)), util_num.to_bin(args.get_int('H4LOOT_COKE_C', 0)),
+            util_num.to_bin(args.get_int('H4LOOT_GOLD_C', 0)))
+        util_bas.print('IS', util_num.to_bin(args.get_int('H4LOOT_CASH_I_SCOPED', 0)),
+            util_num.to_bin(args.get_int('H4LOOT_WEED_I_SCOPED', 0)),
+            util_num.to_bin(args.get_int('H4LOOT_COKE_I_SCOPED', 0)),
+            util_num.to_bin(args.get_int('H4LOOT_GOLD_I_SCOPED', 0)))
+        util_bas.print('IS', util_num.to_bin(args.get_int('H4LOOT_CASH_C_SCOPED', 0)),
+            util_num.to_bin(args.get_int('H4LOOT_WEED_C_SCOPED', 0)),
+            util_num.to_bin(args.get_int('H4LOOT_COKE_C_SCOPED', 0)),
+            util_num.to_bin(args.get_int('H4LOOT_GOLD_C_SCOPED', 0)))
+        util_bas.print('P', util_num.to_bin(args.get_int('H4LOOT_PAINT', 0)),
+            util_num.to_bin(args.get_int('H4LOOT_PAINT_SCOPED', 0)), util_num.to_bin(args.get_int('H4LOOT_PAINT_V', 0)))
+    end)
+
+    RB_U.notify('TEST MESSAGE CONTENT, RED NOTIFY', RB_G.lvl.ERR)
+    RB_U.notify('TEST MESSAGE CONTENT, YELLOW NOTIFY', RB_G.lvl.WRN)
+    RB_U.notify('TEST MESSAGE CONTENT, GREEN NOTIFY', RB_G.lvl.SUC)
+    RB_U.notify('TEST MESSAGE CONTENT, BLUE NOTIFY', RB_G.lvl.INF)
+    RB_U.notify('TEST MESSAGE CONTENT, PURPLE NOTIFY', RB_G.lvl.DBG)
+end})
+-- RB_G.menu.test:set_str_data(RB_G.cra_typ)
+
+RB_U.menus_add({'mntr', '作弊监控', 'parent', 'main'},
+    {'mntr_swtc', '开启监控', 'toggle', 'mntr', RB_H.mntr_swtc},
+    {'mntr_disp', '实时显示', 'toggle', 'mntr', RB_H.mntr_disp},
+    {'mntr_mlog', '记录日志', 'toggle', 'mntr', RB_H.mntr_mlog},
+    {'mntr_coln', '每行玩家个数', 'autoaction_value_i', 'mntr', RB_H.mntr_coln},
+    {'mntr_size', '字体大小', 'autoaction_value_i', 'mntr', RB_H.mntr_size},
+    {'mntr_heig', '行高倍数', 'autoaction_value_f', 'mntr', RB_H.mntr_heig},
+    {'mntr_red', 'RD', 'autoaction_value_i', 'mntr', RB_H.mntr_red},
+    {'mntr_gren', 'GN', 'autoaction_value_i', 'mntr', RB_H.mntr_gren},
+    {'mntr_blue', 'BU', 'autoaction_value_i', 'mntr', RB_H.mntr_blue},
+    {'mntr_alph', '不透明度', 'autoaction_value_i', 'mntr', RB_H.mntr_alph},
+    {'mntr_slep', '检测间隔ms', 'autoaction_value_i', 'mntr', RB_H.mntr_slep})
 RB_G.menu.mntr_swtc.on = RB_G.cfgs:get('MNTR', 'modder_monitor_enable')
 RB_G.menu.mntr_disp.on = RB_G.cfgs:get('MNTR', 'display')
 RB_G.menu.mntr_mlog.on = RB_G.cfgs:get('MNTR', 'log_enable')
@@ -153,21 +188,23 @@ RB_G.menu.mntr_slep.max = 20000
 RB_G.menu.mntr_slep.mod = 1000
 RB_G.menu.mntr_slep.value = RB_G.cfgs:get('MNTR', 'sleep')
 
-RB_U.menus_add({{'tele_auto', '自动传标记点', 'toggle', 'tele', RB_H.tele_auto},
-                {'tele_fowr', '向前闪现', 'action_value_i', 'tele', RB_H.tele_fowr},
-                {'tele_kosa', '传送到虎鲸', 'action', 'tele', RB_H.tele_kosa}})
+RB_U.menus_add({'tele', '传送选项', 'parent', 'main'},
+    {'tele_auto', '自动传标记点', 'toggle', 'tele', RB_H.tele_auto},
+    {'tele_fowr', '向前闪现', 'action_value_i', 'tele', RB_H.tele_fowr},
+    {'tele_kosa', '传送到虎鲸', 'action', 'tele', RB_H.tele_kosa})
 RB_G.menu.tele_auto.on = RB_G.cfgs:get('TELE', 'auto_teleport')
 RB_G.menu.tele_fowr.min = 1
 RB_G.menu.tele_fowr.max = 25
 RB_G.menu.tele_fowr.mod = 2
 RB_G.menu.tele_fowr.value = RB_G.cfgs:get('TELE', 'flash_distance')
 
-RB_U.menus_add({{'wrld_ctrl_rang', '控制范围', 'autoaction_value_f', 'wrld', RB_H.wrld_ctrl_rang},
-                {'wrld_npcs_kill', 'NPC自动死亡', 'toggle', 'wrld', RB_H.wrld_npcs_kill},
-                {'wrld_npcs_remo', 'NPC自动移除', 'toggle', 'wrld', RB_H.wrld_npcs_remo},
-                {'wrld_npcs_t2me', 'NPC自动传送面前', 'toggle', 'wrld', RB_H.wrld_npcs_t2me},
-                {'wrld_npcs_frze', 'NPC自动冻结', 'toggle', 'wrld', RB_H.wrld_npcs_frze},
-                {'wrld_objs_tele', '物品自动传送面前', 'toggle', 'wrld', RB_H.wrld_objs_tele}})
+RB_U.menus_add({'wrld', '世界选项', 'parent', 'main'},
+    {'wrld_ctrl_rang', '控制范围', 'autoaction_value_f', 'wrld', RB_H.wrld_ctrl_rang},
+    {'wrld_npcs_kill', 'NPC自动死亡', 'toggle', 'wrld', RB_H.wrld_npcs_kill},
+    {'wrld_npcs_remo', 'NPC自动移除', 'toggle', 'wrld', RB_H.wrld_npcs_remo},
+    {'wrld_npcs_t2me', 'NPC自动传送面前', 'toggle', 'wrld', RB_H.wrld_npcs_t2me},
+    {'wrld_npcs_frze', 'NPC自动冻结', 'toggle', 'wrld', RB_H.wrld_npcs_frze},
+    {'wrld_objs_tele', '物品自动传送面前', 'toggle', 'wrld', RB_H.wrld_objs_tele})
 RB_G.menu.wrld_ctrl_rang.min = 25
 RB_G.menu.wrld_ctrl_rang.max = 500
 RB_G.menu.wrld_ctrl_rang.mod = 25
@@ -178,19 +215,21 @@ RB_G.menu.wrld_npcs_t2me.on = RB_G.cfgs:get('WRLD', 'npcs_teleport_to_me')
 RB_G.menu.wrld_npcs_frze.on = RB_G.cfgs:get('WRLD', 'npcs_freeze')
 RB_G.menu.wrld_objs_tele.on = RB_G.cfgs:get('WRLD', 'objects_teleport')
 
-RB_U.menus_add({{'stat_addt', '增加在线时长', 'action_value_str', 'stat', RB_H.stat_addt},
-                {'stat_rdct', '减少在线时长', 'action_value_str', 'stat', RB_H.stat_rdct}})
+RB_U.menus_add({'stat', '统计选项', 'parent', 'main'},
+    {'stat_addt', '增加在线时长', 'action_value_str', 'stat', RB_H.stat_addt},
+    {'stat_rdct', '减少在线时长', 'action_value_str', 'stat', RB_H.stat_rdct})
 RB_G.menu.stat_addt:set_str_data({'先按确定看说明', '1hor', '1day', '1wek', '1mon', '3mon', '6mon', '1yer'})
 RB_G.menu.stat_rdct:set_str_data({'先按确定看说明', '1hor', '1day', '1wek', '1mon', '3mon', '6mon', '1yer'})
 
-RB_U.menus_add({{'char_warn', '警告喊话', 'parent', 'chat'}, {'char_judg', '聊天审判', 'parent', 'chat'},
-                {'char_judg_swtc', '开启审判', 'toggle', 'char_judg', RB_H.char_judg_swtc},
-                {'char_judg_type', '崩溃方式', 'autoaction_value_str', 'char_judg', RB_H.char_judg_type},
-                {'char_judg_noti', '是否通知', 'toggle', 'char_judg', RB_H.char_judg_noti},
-                {'char_judg_keys_add', '添加关键字', 'action', 'char_judg', RB_H.char_judg_keys_add},
-                {'char_warn_swtc', '开启警告', 'action', 'char_warn', RB_H.char_warn_swtc},
-                {'char_warn_msgs', '短信喊话', 'action', 'char_warn', RB_H.char_warn_msgs},
-                {'char_warn_glob', '公屏喊话', 'action', 'char_warn', RB_H.char_warn_glob}})
+RB_U.menus_add({'chat', '聊天选项', 'parent', 'main'}, {'char_warn', '警告喊话', 'parent', 'chat'},
+    {'char_judg', '聊天审判', 'parent', 'chat'},
+    {'char_judg_swtc', '开启审判', 'toggle', 'char_judg', RB_H.char_judg_swtc},
+    {'char_judg_type', '崩溃方式', 'autoaction_value_str', 'char_judg', RB_H.char_judg_type},
+    {'char_judg_noti', '是否通知', 'toggle', 'char_judg', RB_H.char_judg_noti},
+    {'char_judg_keys_add', '添加关键字', 'action', 'char_judg', RB_H.char_judg_keys_add},
+    {'char_warn_swtc', '开启警告', 'action', 'char_warn', RB_H.char_warn_swtc},
+    {'char_warn_msgs', '短信喊话', 'action', 'char_warn', RB_H.char_warn_msgs},
+    {'char_warn_glob', '公屏喊话', 'action', 'char_warn', RB_H.char_warn_glob})
 RB_G.menu.char_judg_swtc.on = RB_G.cfgs:get('CHAR', 'chat_judge_enable')
 RB_G.menu.char_judg_type:set_str_data({'kek', 'mmt'})
 RB_G.menu.char_judg_type.value = RB_G.cfgs:get('CHAR', 'chat_judge_type')
@@ -199,16 +238,56 @@ RB_G.menu.char_judg_keys = {}
 RB_G.jud_kws = util_str.split(RB_G.cfgs:get('CHAR', 'chat_judge_keywords'), ', ')
 RB_H.refresh_chat_judge_keywords()
 
-RB_U.menus_add({{'heis', '抢劫选项', 'parent', 'main'}, {'heis_part', '公寓抢劫', 'parent', 'heis'},
-                {'heis_part_paym', '修改分红', 'action', 'heis_part', RB_H.heis_part_paym},
-                {'heis_diam', '名钻赌场', 'parent', 'heis'},
-                {'heis_diam_paym', '修改分红', 'action', 'heis_diam', RB_H.heis_diam_paym},
-                {'heis_peri', '佩里科岛', 'parent', 'heis'},
-                {'heis_peri_paym', '修改分红', 'action', 'heis_peri', RB_H.heis_peri_paym},
-                {'heis_doom', '末日豪劫', 'parent', 'heis'},
-                {'heis_doom_paym', '修改分红', 'action', 'heis_doom', RB_H.heis_doom_paym}})
+RB_U.menus_add({'heist', '抢劫选项', 'parent', 'main'}, {'heist_apartment', '公寓抢劫', 'parent', 'heist'},
+    {'heist_apartment_cut', '修改分红', 'action', 'heist_apartment', RB_H.heist_apartment_cut},
+    {'heist_casino', '名钻赌场', 'parent', 'heist'},
+    {'heist_casino_cut', '修改分红', 'action', 'heist_casino', RB_H.heist_casino_cut},
+    {'heist_cayo', '佩里科岛', 'parent', 'heist'},
+    {'heist_cayo_cut', '修改分红', 'action', 'heist_cayo', RB_H.heist_cayo_cut},
+    {'heist_cayo_mode', '模式', 'value_str', 'heist_cayo', RB_H.heist_cayo_mode},
+    {'heist_cayo_target', '目标', 'value_str', 'heist_cayo', RB_H.heist_cayo_target},
+    {'heist_cayo_second', '次要目标', 'value_str', 'heist_cayo', RB_H.heist_cayo_second},
+    {'heist_cayo_vehicle', '接近载具', 'value_str', 'heist_cayo', RB_H.heist_cayo_vehicle},
+    {'heist_cayo_weapon', '武器', 'value_str', 'heist_cayo', RB_H.heist_cayo_weapon},
+    {'heist_cayo_truck', '卡车位置', 'value_str', 'heist_cayo', RB_H.heist_cayo_truck},
+    {'heist_cayo_interest', '侦察兴趣点', 'toggle', 'heist_cayo', RB_H.heist_cayo_interest},
+    {'heist_cayo_disturb', '全部干扰', 'toggle', 'heist_cayo', RB_H.heist_cayo_disturb},
+    {'heist_cayo_enable', '写入数据', 'action', 'heist_cayo', RB_H.heist_cayo_enable},
+    {'heist_doomsday', '末日豪劫', 'parent', 'heist'},
+    {'heist_doomsday_cut', '修改分红', 'action', 'heist_doomsday', RB_H.heist_doomsday_cut})
+RB_U.menus_set({'heist_cayo_mode', {
+    str_data = {'普通', '困难'},
+    value = RB_G.cfgs:get('HEIST', 'heist_cayo_mode'),
+    on = RB_G.cfgs:get('HEIST', 'heist_cayo_mode_on')
+}}, {'heist_cayo_target', {
+    str_data = {'西西米托龙舌兰', '红宝石项链', '不记名债券', '粉钻', '玛德拉索文件',
+                '猎豹雕像'},
+    value = RB_G.cfgs:get('HEIST', 'heist_cayo_target'),
+    on = RB_G.cfgs:get('HEIST', 'heist_cayo_target_on')
+}}, {'heist_cayo_second', {
+    str_data = {'现金', '大麻', '可卡因', '黄金', '画作', '随机'},
+    value = RB_G.cfgs:get('HEIST', 'heist_cayo_second'),
+    on = RB_G.cfgs:get('HEIST', 'heist_cayo_second_on')
+}}, {'heist_cayo_vehicle', {
+    str_data = {'虎鲸', '阿尔科诺斯特', '梅杜莎', '隐形歼灭者', '巡逻艇', '长鳍'},
+    value = RB_G.cfgs:get('HEIST', 'heist_cayo_vehicle'),
+    on = RB_G.cfgs:get('HEIST', 'heist_cayo_vehicle_on')
+}}, {'heist_cayo_weapon', {
+    str_data = {'侵略者', '阴谋者', '神枪手', '破坏者', '神射手'},
+    value = RB_G.cfgs:get('HEIST', 'heist_cayo_weapon'),
+    on = RB_G.cfgs:get('HEIST', 'heist_cayo_weapon_on')
+}}, {'heist_cayo_truck', {
+    str_data = {'机场', '北船坞', '主码头-东', '主码头-西', '豪宅门口'},
+    value = RB_G.cfgs:get('HEIST', 'heist_cayo_truck'),
+    on = RB_G.cfgs:get('HEIST', 'heist_cayo_truck_on')
+}}, {'heist_cayo_disturb', {
+    on = RB_G.cfgs:get('HEIST', 'heist_cayo_disturb_on')
+}}, {'heist_cayo_interest', {
+    on = RB_G.cfgs:get('HEIST', 'heist_cayo_interest_on')
+}})
 
-RB_U.menus_add({{'sett_save', '保存设置', 'action', 'sett', RB_H.sett_save}})
+RB_U.menus_add({'sett', '菜单设置', 'parent', 'main'},
+    {'sett_save', '保存设置', 'action', 'sett', RB_H.sett_save})
 
 local pf_id = menu.add_player_feature('RockByte', 'parent', 0).id
 menu.add_player_feature('传送佩里科岛', 'action', pf_id, RB_H.onli_2prc)
@@ -220,15 +299,15 @@ menu.add_player_feature('游戏崩溃', 'action_value_str', pf_id, RB_H.onli_cra
 -- for ply_i = 0, RB_G.max_player do
 --     local p_keys = string.format(RB_G.menu_player_keys, ply_i)
 --     local p_feat_keys = string.format(RB_G.menu_player_feat_keys, ply_i)
---     RB_U.menus_add({{p_keys, p_keys, 'parent', RB_G.menu.onli.id},
+--     RB_U.menus_add({p_keys, p_keys, 'parent', RB_G.menu.onli.id},
 --                     {p_feat_keys .. '.to_perico', '传送佩里科岛', 'action', p_keys, RB_H.onli_2prc},
 --                     {p_feat_keys .. '.to_partment', '传送日蚀公寓', 'action', p_keys, RB_H.onli_2par},
 --                     {p_feat_keys .. '.teleport2me', '到我面前(目标在载具中有效)', 'action', p_keys,
---                      RB_H.onli_tp2m}, {p_feat_keys .. '.game_crashes', '游戏崩溃', 'action', p_keys, RB_H.onli_cras}})
+--                      RB_H.onli_tp2m}, {p_feat_keys .. '.game_crashes', '游戏崩溃', 'action', p_keys, RB_H.onli_cras})
 --     local data = {
 --         ply_id = ply_i
 --     }
---     RB_U.menus_set_property({{p_feat_keys .. '.to_perico', {
+--     RB_U.menus_set({{p_feat_keys .. '.to_perico', {
 --         threaded = false,
 --         data = data
 --     }, {p_feat_keys .. '.to_partment', {
