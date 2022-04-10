@@ -4,8 +4,8 @@ local _Module = {
 }
 
 _Module.menu = {}
-_Module.menu_player_keys = 'onli_play.player_%d'
-_Module.menu_player_feat_keys = 'onli_play.player_feat_%d'
+_Module.menu_player_keys = 'online_play.player_%d'
+_Module.menu_player_feat_keys = 'online_play.player_feat_%d'
 
 _Module.cfgs = {}
 _Module.paths = {}
@@ -92,6 +92,9 @@ _Module.ped = {}
 _Module.ped.fri_hsh = {}
 _Module.ped.enm_hsh = {}
 _Module.ped.enm_unk = {}
+
+_Module.world = {}
+_Module.world.pickup_log = {}
 
 -- 0xb0423aa0 | 2957130400 -- 医生
 -- 0xa49e591c | 2761840924 -- 警察
@@ -208,6 +211,18 @@ _Module.heist = {}
 _Module.heist.cayo = {}
 _Module.heist.cayo.mode = {126823, 131055}
 _Module.heist.cayo.vehicle = {65283, 65413, 65289, 65425, 65313, 65345, 65535}
+_Module.heist.cayo.second_i = {
+    log = 0,
+    max = 16777215
+}
+_Module.heist.cayo.second_c = {
+    log = 0,
+    max = 255
+}
+_Module.heist.cayo.second_p = {
+    log = 0,
+    max = 127
+}
 
 _Module.eve = {}
 

@@ -10,6 +10,7 @@ local util_bas = require('utils.base')
 local util_str = require('utils.string')
 local util_log = require('utils.logger')
 local util_tim = require('utils.time')
+local util_num = require('utils.number')
 
 function _Module.loop(feat)
     if not feat.on then
@@ -109,7 +110,7 @@ function _Module.loop(feat)
     return HANDLER_CONTINUE
 end
 
-function _Module.onli_2prc(feat, pid)
+function _Module.online_to_cayo(feat, pid)
     if player.player_id() == pid then
         RB_U.notify('你正在对自己进行恶意操作!本次操作取消', RB_G.lvl.WRN)
         return
@@ -120,7 +121,7 @@ function _Module.onli_2prc(feat, pid)
     RB_U.notify('操作完成', RB_G.lvl.SUC)
 end
 
-function _Module.onli_2par(feat, pid)
+function _Module.online_to_apartment(feat, pid)
     if player.player_id() == pid then
         RB_U.notify('你正在对自己进行恶意操作!本次操作取消', RB_G.lvl.WRN)
         return
@@ -130,7 +131,7 @@ function _Module.onli_2par(feat, pid)
     RB_U.notify('操作完成', RB_G.lvl.SUC)
 end
 
-function _Module.onli_tp2m(feat, pid)
+function _Module.online_teleport2me(feat, pid)
     if player.player_id() == pid then
         RB_U.notify('你正在对自己进行恶意操作!本次操作取消', RB_G.lvl.WRN)
         return
@@ -157,7 +158,19 @@ function _Module.onli_tp2m(feat, pid)
     RB_U.notify('操作完成', RB_G.lvl.SUC)
 end
 
-function _Module.onli_cras(feat, pid)
+function _Module.online_remove_god(feat, pid)
+    -- 未经实验函数
+    if player.player_id() == pid then
+        RB_U.notify('你正在对自己进行恶意操作!本次操作取消', RB_G.lvl.WRN)
+        return
+    end
+    while feat.on do
+        RB_U.send_script_event(801199324, pid, {801199324, pid, 869796886})
+        system.yield(10)
+    end
+end
+
+function _Module.online_crashes(feat, pid)
     if player.player_id() == pid then
         RB_U.notify('你正在对自己进行恶意操作!本次操作取消', RB_G.lvl.WRN)
         return
@@ -333,10 +346,6 @@ function _Module.wrld_npcs_frze(feat)
 end
 
 function _Module.wrld_objs_tele(feat)
-    RB_G.cfgs:set('WRLD', 'objects_teleport', feat.on)
-    if not RB_G.cfgs:get('WRLD', 'objects_teleport') then
-        return
-    end
     local before_loop = function(data)
         data.to_coords = RB_U.gen_player_front_coords(player.player_id())
     end
@@ -349,7 +358,26 @@ function _Module.wrld_objs_tele(feat)
     RB_U.control_objects(control, {
         before_loop = before_loop
     })
-    return HANDLER_CONTINUE
+end
+
+function _Module.wrld_objs_tele_me(feat)
+    local control = function(data)
+        if RB_G.world.pickup_log[data.object.id] and os.time() - RB_G.world.pickup_log[data.object.id] < 15 then -- 避免15s内传送到相同的物品
+            return true
+        end
+        if data.object.id < 2 then -- 避免传送到自己身上的物品处
+            return true
+        end
+        -- data.object.coords.x = data.object.coords.x + 2
+        -- data.object.coords.y = data.object.coords.y + 2
+        data.object.coords.z = data.object.coords.z + 2
+        RB_U.teleport(data.player.ped, data.object.coords, {
+            delay = 0
+        })
+        RB_G.world.pickup_log[data.object.id] = os.time()
+        return false
+    end
+    RB_U.control_objects(control)
 end
 
 function _Module.stat_addt(feat)
@@ -551,24 +579,6 @@ function _Module.heist_casino_cut(feat)
     end
 end
 
-function _Module.heist_cayo_cut(feat)
-    local respone, data = nil, nil
-    while true do
-        respone, data = input.get('输入分红百分比', '85', 10, 0)
-        if respone == 1 then
-            system.yield(100)
-        elseif respone == 2 then
-            return
-        else
-            break
-        end
-    end
-    local payment = tonumber(data)
-    for i = 1, player.player_count() do
-        script.set_global_i(1973496 + 823 + 56 + i, payment)
-    end
-end
-
 function _Module.heist_doomsday_cut(feat)
     local respone, data = nil, nil
     while true do
@@ -603,109 +613,276 @@ function _Module.refresh_chat_judge_keywords()
     end
 end
 
+function _Module.heist_cayo_cut(feat)
+    local respone, data = nil, nil
+    while true do
+        respone, data = input.get('输入分红百分比', '85', 10, 0)
+        if respone == 1 then
+            system.yield(100)
+        elseif respone == 2 then
+            return
+        else
+            break
+        end
+    end
+    local payment = tonumber(data)
+    for i = 1, player.player_count() do
+        script.set_global_i(1973496 + 823 + 56 + i, payment)
+    end
+end
+
 function _Module.heist_cayo_mode(feat)
-    RB_G.cfgs:set('HEIST', 'heist_cayo_mode', feat.value)
-    RB_G.cfgs:set('HEIST', 'heist_cayo_mode_on', feat.on)
+    RB_G.cfgs:set('HEIST', 'cayo_mode', feat.value)
+    RB_G.cfgs:set('HEIST', 'cayo_mode_on', feat.on)
 end
 
 function _Module.heist_cayo_target(feat)
-    RB_G.cfgs:set('HEIST', 'heist_cayo_target', feat.value)
-    RB_G.cfgs:set('HEIST', 'heist_cayo_target_on', feat.on)
+    RB_G.cfgs:set('HEIST', 'cayo_target', feat.value)
+    RB_G.cfgs:set('HEIST', 'cayo_target_on', feat.on)
 end
 
-function _Module.heist_cayo_second(feat)
-    RB_G.cfgs:set('HEIST', 'heist_cayo_second', feat.value)
-    RB_G.cfgs:set('HEIST', 'heist_cayo_second_on', feat.on)
+function _Module.heist_cayo_c_cash(feat)
+    -- local old_number = RB_G.cfgs:get('HEIST', 'cayo_cash_c_number')
+    -- local old_on = RB_G.cfgs:get('HEIST', 'cayo_cash_c_on')
+    -- if RB_U.is_cayo_point_over_c() then
+    --     feat.value = old_number
+    --     feat.on = old_on
+    --     RB_G.cfgs:set('HEIST', 'cayo_cash_c_number', old_number)
+    --     RB_G.cfgs:set('HEIST', 'cayo_cash_c_on', old_on)
+    --     return
+    -- end
+    RB_G.cfgs:set('HEIST', 'cayo_cash_c_number', feat.value)
+    RB_G.cfgs:set('HEIST', 'cayo_cash_c_on', feat.on)
+end
+
+function _Module.heist_cayo_i_cash(feat)
+    -- local old_number = RB_G.cfgs:get('HEIST', 'cayo_cash_i_number')
+    -- local old_on = RB_G.cfgs:get('HEIST', 'cayo_cash_i_on')
+    -- if RB_U.is_cayo_point_over_i() then
+    --     feat.value = old_number
+    --     feat.on = old_on
+    --     RB_G.cfgs:set('HEIST', 'cayo_cash_i_number', old_number)
+    --     RB_G.cfgs:set('HEIST', 'cayo_cash_i_on', old_on)
+    --     return
+    -- end
+    RB_G.cfgs:set('HEIST', 'cayo_cash_i_number', feat.value)
+    RB_G.cfgs:set('HEIST', 'cayo_cash_i_on', feat.on)
+end
+
+function _Module.heist_cayo_weed(feat)
+    -- local old_number = RB_G.cfgs:get('HEIST', 'cayo_weed_number')
+    -- local old_on = RB_G.cfgs:get('HEIST', 'cayo_weed_on')
+    -- RB_G.cfgs:set('HEIST', 'cayo_weed_number', feat.value)
+    -- RB_G.cfgs:set('HEIST', 'cayo_weed_on', feat.on)
+    -- if RB_U.is_cayo_point_over_i() then
+    --     feat.value = old_number
+    --     feat.on = old_on
+    --     RB_G.cfgs:set('HEIST', 'cayo_weed_number', old_number)
+    --     RB_G.cfgs:set('HEIST', 'cayo_weed_on', old_on)
+    --     return
+    -- end
+    RB_G.cfgs:set('HEIST', 'cayo_weed_number', feat.value)
+    RB_G.cfgs:set('HEIST', 'cayo_weed_on', feat.on)
+end
+
+function _Module.heist_cayo_coke(feat)
+    -- local old_number = RB_G.cfgs:get('HEIST', 'cayo_coke_number')
+    -- local old_on = RB_G.cfgs:get('HEIST', 'cayo_coke_on')
+    -- RB_G.cfgs:set('HEIST', 'cayo_coke_number', feat.value)
+    -- RB_G.cfgs:set('HEIST', 'cayo_coke_on', feat.on)
+    -- if RB_U.is_cayo_point_over_i() then
+    --     feat.value = old_number
+    --     feat.on = old_on
+    --     RB_G.cfgs:set('HEIST', 'cayo_coke_number', old_number)
+    --     RB_G.cfgs:set('HEIST', 'cayo_coke_on', old_on)
+    --     return
+    -- end
+    RB_G.cfgs:set('HEIST', 'cayo_coke_number', feat.value)
+    RB_G.cfgs:set('HEIST', 'cayo_coke_on', feat.on)
+end
+
+function _Module.heist_cayo_gold(feat)
+    -- local old_number = RB_G.cfgs:get('HEIST', 'cayo_gold_number')
+    -- local old_on = RB_G.cfgs:get('HEIST', 'cayo_gold_on')
+    -- if RB_U.is_cayo_point_over_c() then
+    --     feat.value = old_number
+    --     feat.on = old_on
+    --     RB_G.cfgs:set('HEIST', 'cayo_gold_number', old_number)
+    --     RB_G.cfgs:set('HEIST', 'cayo_gold_on', old_on)
+    --     return
+    -- end
+    RB_G.cfgs:set('HEIST', 'cayo_gold_number', feat.value)
+    RB_G.cfgs:set('HEIST', 'cayo_gold_on', feat.on)
+end
+
+function _Module.heist_cayo_paint(feat)
+    RB_G.cfgs:set('HEIST', 'cayo_paint_number', feat.value)
+    RB_G.cfgs:set('HEIST', 'cayo_paint_on', feat.on)
 end
 
 function _Module.heist_cayo_vehicle(feat)
-    RB_G.cfgs:set('HEIST', 'heist_cayo_vehicle', feat.value)
-    RB_G.cfgs:set('HEIST', 'heist_cayo_vehicle_on', feat.on)
+    RB_G.cfgs:set('HEIST', 'cayo_vehicle', feat.value)
+    RB_G.cfgs:set('HEIST', 'cayo_vehicle_on', feat.on)
 end
 
 function _Module.heist_cayo_weapon(feat)
-    RB_G.cfgs:set('HEIST', 'heist_cayo_weapon', feat.value)
-    RB_G.cfgs:set('HEIST', 'heist_cayo_weapon_on', feat.on)
+    RB_G.cfgs:set('HEIST', 'cayo_weapon', feat.value)
+    RB_G.cfgs:set('HEIST', 'cayo_weapon_on', feat.on)
 end
 
 function _Module.heist_cayo_truck(feat)
-    RB_G.cfgs:set('HEIST', 'heist_cayo_truck', feat.value)
-    RB_G.cfgs:set('HEIST', 'heist_cayo_truck_on', feat.on)
+    RB_G.cfgs:set('HEIST', 'cayo_truck', feat.value)
+    RB_G.cfgs:set('HEIST', 'cayo_truck_on', feat.on)
 end
 
 function _Module.heist_cayo_disturb(feat)
-    RB_G.cfgs:set('HEIST', 'heist_cayo_disturb_on', feat.on)
+    RB_G.cfgs:set('HEIST', 'cayo_disturb_on', feat.on)
 end
 
 function _Module.heist_cayo_interest(feat)
-    RB_G.cfgs:set('HEIST', 'heist_cayo_interest_on', feat.on)
+    RB_G.cfgs:set('HEIST', 'cayo_interest_on', feat.on)
 end
 
 function _Module.heist_cayo_enable(feat)
-    if RB_G.cfgs:get('heist_cayo_mode_on') then
+    -- 这个函数逻辑搞得太复杂了，短期不再继续修改
+    if RB_U.is_cayo_point_over_c() or RB_U.is_cayo_point_over_i() then
+        RB_U.notify('操作取消!请修正数据后继续', RB_G.lvl.WRN)
+        return
+    end
+    RB_G.heist.cayo.second_i.log = 0
+    RB_G.heist.cayo.second_c.log = 0
+    local is_edited = false
+    if RB_G.cfgs:get('HEIST', 'cayo_mode_on') then
         RB_U.control_stats(function(args)
-            local value = RB_G.heist.cayo.mode[RB_U.menu_get('heist_cayo_mode').value + 1]
+            local value = RB_G.heist.cayo.mode[RB_G.cfgs:get('HEIST', 'cayo_mode') + 1]
             return args.set_int('H4_PROGRESS', value, true)
         end)
+        is_edited = true
     end
-    if RB_G.cfgs:get('heist_cayo_target_on') then
+    if RB_G.cfgs:get('HEIST', 'cayo_target_on') then
         RB_U.control_stats(function(args)
-            return args.set_int('H4CNF_TARGET', RB_U.menu_get('heist_cayo_target').value, true)
+            return args.set_int('H4CNF_TARGET', RB_G.cfgs:get('HEIST', 'cayo_target'), true)
         end)
+        is_edited = true
     end
-    if RB_G.cfgs:get('heist_cayo_second_on') then
-        -- 豪宅外最大放置情况：16777215 -> 111111111111111111111111
-        -- 豪宅内最大放置情况：255 -> 11111111
-        -- 豪宅内画作最大放置情况：127 -> 1111111
-        -- 豪宅外正常放置个数：8-16
-        -- 豪宅内正常放置个数：3-6
-        -- 豪宅内正常画作个数：2-4
-        -- 说明：-1解锁所有点位
-        -- RB_U.control_stats(function(args)
-        --     return args.set_int('H4CNF_TARGET', RB_U.menu_get('heist_cayo_second').value, true)
-        -- end)
+    -- 花了三天来设计，感觉有点不值
+    -- 豪宅外最大放置情况：16777215 -> 111111111111111111111111
+    -- 豪宅内最大放置情况：255 -> 11111111
+    -- 豪宅内画作最大放置情况：127 -> 1111111
+    -- 豪宅外正常放置个数：8-16
+    -- 豪宅内正常放置个数：3-6
+    -- 豪宅内正常画作个数：2-4
+    -- 说明：-1解锁所有点位，推测实际应该是uint型
+    if RB_G.cfgs:get('HEIST', 'cayo_cash_c_on') then
+        RB_U.mod_cayo_point(RB_G.cfgs:get('HEIST', 'cayo_cash_c_number') * 2, 'H4LOOT_CASH_C', RB_G.heist.cayo.second_c)
+        is_edited = true
     end
-    if RB_G.cfgs:get('heist_cayo_vehicle_on') then
+    if RB_G.cfgs:get('HEIST', 'cayo_gold_on') then
+        RB_U.mod_cayo_point(RB_G.cfgs:get('HEIST', 'cayo_gold_number') * 2, 'H4LOOT_GOLD_C', RB_G.heist.cayo.second_c)
+        is_edited = true
+    end
+    if RB_G.cfgs:get('HEIST', 'cayo_cash_i_on') then
+        RB_U.mod_cayo_point(RB_G.cfgs:get('HEIST', 'cayo_cash_i_number') * 3, 'H4LOOT_CASH_I', RB_G.heist.cayo.second_i)
+        is_edited = true
+    end
+    if RB_G.cfgs:get('HEIST', 'cayo_weed_on') then
+        RB_U.mod_cayo_point(RB_G.cfgs:get('HEIST', 'cayo_weed_number') * 3, 'H4LOOT_WEED_I', RB_G.heist.cayo.second_i)
+        is_edited = true
+    end
+    if RB_G.cfgs:get('HEIST', 'cayo_coke_on') then
+        RB_U.mod_cayo_point(RB_G.cfgs:get('HEIST', 'cayo_coke_number') * 3, 'H4LOOT_COKE_I', RB_G.heist.cayo.second_i)
+        is_edited = true
+    end
+    if RB_G.cfgs:get('HEIST', 'cayo_paint_on') then
+        RB_U.mod_cayo_point(RB_G.cfgs:get('HEIST', 'cayo_paint_number') * 3, 'H4LOOT_PAINT', RB_G.heist.cayo.second_i)
+        is_edited = true
+    end
+    if RB_G.cfgs:get('HEIST', 'cayo_vehicle_on') then
         RB_U.control_stats(function(args)
-            local value = RB_G.heist.cayo.mode[RB_U.menu_get('heist_cayo_vehicle').value + 1]
+            local value = RB_G.heist.cayo.vehicle[RB_G.cfgs:get('HEIST', 'cayo_vehicle') + 1]
             return args.set_int('H4_MISSIONS', value, true)
         end)
+        is_edited = true
     end
-    if RB_G.cfgs:get('heist_cayo_weapon_on') then
+    if RB_G.cfgs:get('HEIST', 'cayo_weapon_on') then
         RB_U.control_stats(function(args)
-            return args.set_int('H4CNF_WEAPONS', RB_U.menu_get('heist_cayo_weapon').value + 1, true)
+            return args.set_int('H4CNF_WEAPONS', RB_G.cfgs:get('HEIST', 'cayo_weapon') + 1, true)
         end)
+        is_edited = true
     end
-    if RB_G.cfgs:get('heist_cayo_truck_on') then
+    if RB_G.cfgs:get('HEIST', 'cayo_truck_on') then
         RB_U.control_stats(function(args)
-            return args.set_int('H4CNF_TROJAN', RB_U.menu_get('heist_cayo_truck').value + 1, true)
+            return args.set_int('H4CNF_TROJAN', RB_G.cfgs:get('HEIST', 'cayo_truck') + 1, true)
         end)
+        is_edited = true
     end
-    if RB_G.cfgs:get('heist_cayo_disturb_on') then
+    if RB_G.cfgs:get('HEIST', 'cayo_interest_on') then
+        RB_U.control_stats(function(args)
+            -- args.set_int('H4CNF_GRAPPEL', -1, true) -- 位置点没有修改的必要
+            -- args.set_int('H4CNF_UNIFORM', -1, true) -- 位置点没有修改的必要
+            -- args.set_int('H4CNF_BOLTCUT', -1, true) -- 位置点没有修改的必要
+            args.set_int('H4CNF_BS_GEN', 126975, true)
+            args.set_int('H4CNF_BS_ABIL', 63, true)
+        end)
+        is_edited = true
+    end
+    if RB_G.cfgs:get('HEIST', 'cayo_disturb_on') then
         RB_U.control_stats(function(args)
             args.set_int('H4CNF_WEP_DISRP', 3, true)
             args.set_int('H4CNF_ARM_DISRP', 3, true)
             args.set_int('H4CNF_HEL_DISRP', 3, true)
         end)
+        is_edited = true
     end
-    if RB_G.cfgs:get('heist_cayo_interest_on') then
-        RB_U.control_stats(function(args)
-            args.set_int('H4CNF_GRAPPEL', -1, true)
-            args.set_int('H4CNF_UNIFORM', -1, true)
-            args.set_int('H4CNF_BOLTCUT', -1, true)
-        end)
+    if not is_edited then
+        RB_U.notify('无任何修改,本次操作取消', RB_G.lvl.WRN)
+        return
     end
-    RB_U.notify('操作成功，如果控制面板未刷新请重新进入虎鲸', RB_G.lvl.SUC)
+    RB_U.fix_cayo_point()
+    RB_U.notify('操作成功,如果控制面板未刷新请重新进入虎鲸', RB_G.lvl.SUC)
 end
 
-function _Module.sett_save(feat)
+function _Module.setting_reset(feat, kwargs)
+    kwargs = kwargs or {}
+    kwargs.enforce = kwargs.enforce or false
+    for _, val in ipairs({{'PROG', 'debug', false}, {'TELE', 'flash_distance', 3}, {'TELE', 'auto_teleport', false},
+                          {'MNTR', 'modder_monitor_enable', false}, {'MNTR', 'display', false},
+                          {'MNTR', 'log_enable', true}, {'MNTR', 'size', 12}, {'MNTR', 'col_number', 16},
+                          {'MNTR', 'col_height', 1.5}, {'MNTR', 'red', 255}, {'MNTR', 'green', 255},
+                          {'MNTR', 'blue', 255}, {'MNTR', 'alpha', 255}, {'MNTR', 'sleep', 5000},
+                          {'WRLD', 'npcs_kill', false}, {'WRLD', 'npcs_remove', false}, {'WRLD', 'accuracy', 50},
+                          {'WRLD', 'accuracy_on', false}, {'WRLD', 'npcs_freeze', false},
+                          {'WRLD', 'npcs_teleport_to_me', false}, {'WRLD', 'combat_ability', 0},
+                          {'WRLD', 'combat_ability_on', false}, {'WRLD', 'control_range', 100},
+                          {'CHAR', 'chat_judge_notice', true}, {'CHAR', 'chat_judge_type', 0},
+                          {'CHAR', 'chat_judge_keywords', 'www%., GTA%d%d%d, 刷金, q群, 售后, 微信, 淘宝, vx'},
+                          {'HEIST', 'cayo_mode', 0}, {'HEIST', 'cayo_mode_on', false}, {'HEIST', 'cayo_target', 0},
+                          {'HEIST', 'cayo_target_on', false}, {'HEIST', 'cayo_cash_c_number', 0},
+                          {'HEIST', 'cayo_cash_c_on', false}, {'HEIST', 'cayo_cash_i_number', 0},
+                          {'HEIST', 'cayo_cash_i_on', false}, {'HEIST', 'cayo_weed_number', 0},
+                          {'HEIST', 'cayo_weed_on', false}, {'HEIST', 'cayo_coke_number', 0},
+                          {'HEIST', 'cayo_coke_on', false}, {'HEIST', 'cayo_gold_number', 0},
+                          {'HEIST', 'cayo_gold_on', false}, {'HEIST', 'cayo_paint_number', 0},
+                          {'HEIST', 'cayo_paint_on', false}, {'HEIST', 'cayo_vehicle', 0},
+                          {'HEIST', 'cayo_vehicle_on', false}, {'HEIST', 'cayo_weapon', 0},
+                          {'HEIST', 'cayo_weapon_on', false}, {'HEIST', 'cayo_truck', 0},
+                          {'HEIST', 'cayo_truck_on', false}, {'HEIST', 'cayo_disturb_on', false},
+                          {'HEIST', 'cayo_interest_on', false}}) do
+        if RB_G.cfgs:get(val[1], val[2]) == nil or kwargs.enforce then
+            RB_G.cfgs:set(val[1], val[2], val[3])
+        end
+    end
+    RB_U.notify('设置配置成功', RB_G.lvl.SUC)
+end
+
+function _Module.setting_save(feat)
     RB_G.cfgs:set('CHAR', 'chat_judge_keywords', table.concat(RB_G.jud_kws, ', '))
     RB_G.cfgs:save()
     RB_U.notify('设置保存成功', RB_G.lvl.SUC)
 end
 
 -- -- 原版鬼崩，使用后重启脚本、切换战局自己也会崩溃
--- function _Module.onli_cras(feat, data)
+-- function _Module.online_crashes(feat, data)
 --     RB_U.notify('开始操作,请稍后', RB_G.lvl.INF)
 --     local self_player = {id = player.player_id()}
 --     self_player.ped = player.get_player_ped(self_player.id)
@@ -742,7 +919,7 @@ end
 -- end
 
 -- 好像没用
--- function _Module.onli_set_god(feat, data)
+-- function _Module.online_set_god(feat, data)
 --     RB_U.notify('开始操作,请稍后', RB_G.lvl.INF)
 --     local player_ped = player.get_player_ped(data.ply_id)
 --     if not RB_U.request_control_of_entity(player_ped) then
@@ -758,7 +935,7 @@ end
 -- end
 
 -- 好像没用
--- function _Module.onli_teleport2mycar(feat, data)
+-- function _Module.online_teleport2mycar(feat, data)
 --     local player_ped = player.get_player_ped(data.ply_id)
 --     if not network.request_control_of_entity(player_ped) then
 --         RB_U.notify('当前无法控制目标', RB_G.lvl.WRN)

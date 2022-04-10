@@ -93,7 +93,10 @@ end
 
 -- 获取一个值
 function _Module:get(session, key, default)
-    return self.data[session] and self.data[session][key] or default
+    if self.data[session] == nil or self.data[session][key] == nil then
+        return default
+    end
+    return self.data[session][key]
 end
 
 -- 设置一个值

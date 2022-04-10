@@ -7,6 +7,7 @@ local RB_G = require('libs.global')
 local util_bas = require('utils.base')
 local util_str = require('utils.string')
 local util_err = require('utils.error')
+local util_num = require('utils.number')
 
 function _Module.menu_get_last_menu(keys, kwargs)
     kwargs = kwargs or {}
@@ -262,15 +263,9 @@ function _Module.control_npcs(control_func, kwargs)
     kwargs.include_dead = kwargs.include_dead or false
     kwargs.before_loop = kwargs.before_loop or function()
     end
-    if kwargs.player then
-        kwargs.player = {
-            id = kwargs.player.id or player.player_id()
-        }
-    else
-        kwargs.player = {
-            id = player.player_id()
-        }
-    end
+    kwargs.player = kwargs.player or {}
+    kwargs.player.id = kwargs.player.id or player.player_id()
+    kwargs.player.ped = kwargs.player.ped or player.get_player_ped(kwargs.player.id)
     local ply_coords = player.get_player_coords(kwargs.player.id)
     local ply_heading = player.get_player_heading(kwargs.player.id)
     kwargs.player.coords = ply_coords
@@ -286,8 +281,9 @@ function _Module.control_npcs(control_func, kwargs)
                 id = ped_id,
                 coords = ped_coords
             }
-            control_func(kwargs)
-            -- if result ~= nil then results[#results + 1] = result end
+            if control_func(kwargs) == false then
+                return
+            end
         end
         ::continue::
     end
@@ -317,20 +313,13 @@ end
 -- end
 
 function _Module.control_objects(control_func, kwargs)
-    -- local results = {}
     kwargs = kwargs or {}
     kwargs.delay = kwargs.delay or 250
     kwargs.before_loop = kwargs.before_loop or function()
     end
-    if kwargs.player then
-        kwargs.player = {
-            id = kwargs.player.id or player.player_id()
-        }
-    else
-        kwargs.player = {
-            id = player.player_id()
-        }
-    end
+    kwargs.player = kwargs.player or {}
+    kwargs.player.id = kwargs.player.id or player.player_id()
+    kwargs.player.ped = kwargs.player.ped or player.get_player_ped(kwargs.player.id)
     local ply_coords = player.get_player_coords(kwargs.player.id)
     local ply_heading = player.get_player_heading(kwargs.player.id)
     kwargs.player.coords = ply_coords
@@ -338,21 +327,27 @@ function _Module.control_objects(control_func, kwargs)
 
     kwargs.before_loop(kwargs)
 
-    for _, object_id in ipairs(object.get_all_pickups()) do
+    local all_pickups = object.get_all_pickups()
+    if #all_pickups <= 0 then
+        _Module.notify('附近未找到物品,操作取消', RB_G.lvl.INF)
+        return false
+    end
+    for _, object_id in ipairs(all_pickups) do
         local object_coords = entity.get_entity_coords(object_id)
-        if util_bas.calc_distance(ply_coords, object_coords) < RB_G.cfgs:get('WRLD', 'control_range') then
-            kwargs.object = {
-                id = object_id,
-                coords = object_coords
-            }
-            control_func(kwargs)
-            -- if result ~= nil then results[#results + 1] = result end
+        kwargs.object = {
+            id = object_id,
+            coords = object_coords,
+            distance = util_bas.calc_distance(ply_coords, object_coords)
+        }
+        if kwargs.object.distance < RB_G.cfgs:get('WRLD', 'control_range') then
+            if control_func(kwargs) == false then
+                return
+            end
         end
     end
     if kwargs.delay > 0 then
         system.yield(kwargs.delay)
     end
-    -- return results
 end
 
 _Module.event_tracker = setmetatable({
@@ -726,12 +721,201 @@ function _Module.set_stat_by_name(type_val, name, value, kwargs)
     system.yield(kwargs.delay)
     return ret
 end
+
 function _Module.set_stats_by_name(stats_tbl, kwargs)
     local ret_data = {}
     for _, stat in ipairs(stats_tbl) do
         ret_data[#ret_data + 1] = _Module.set_stat_by_name(stats_tbl[1], stats_tbl[2], stats_tbl[3], kwargs)
     end
     return ret_data
+end
+
+function _Module.is_cayo_point_over_c(kwargs)
+    kwargs = kwargs or {}
+
+    local curr_paint = RB_G.cfgs:get('HEIST', 'cayo_paint_number')
+    local curr_cash = RB_G.cfgs:get('HEIST', 'cayo_cash_c_number')
+    local curr_gold = RB_G.cfgs:get('HEIST', 'cayo_gold_number')
+    _Module.control_stats(function(args)
+        if RB_G.cfgs:get('HEIST', 'cayo_paint_on') then
+            kwargs.paint = curr_paint == 0 and util_num.count_bin_1(args.get_int('H4LOOT_PAINT', 0)) or curr_paint * 2 -
+                               1
+        end
+        if RB_G.cfgs:get('HEIST', 'cayo_cash_c_on') then
+            kwargs.cash = curr_cash == 0 and util_num.count_bin_1(args.get_int('H4LOOT_CASH_C', 0)) or curr_cash * 2
+        end
+        if RB_G.cfgs:get('HEIST', 'cayo_gold_on') then
+            kwargs.gold = curr_gold == 0 and util_num.count_bin_1(args.get_int('H4LOOT_GOLD_C', 0)) or curr_gold * 2
+        end
+    end)
+    if RB_G.cfgs:get('HEIST', 'cayo_paint_on') and kwargs.paint > 7 then
+        _Module.notify('豪宅内最多可放置 7 幅画作点\n当前画作修改数: ' .. kwargs.paint, RB_G.lvl.WRN)
+        return true
+    end
+    local msg = '豪宅内最多可放置 8 个现金/黄金点'
+    local sum_number = 0
+    if RB_G.cfgs:get('HEIST', 'cayo_cash_c_on') then
+        sum_number = sum_number + kwargs.cash
+        if curr_cash == 0 then
+            msg = msg .. '\n当前默认现金数: ' .. kwargs.cash
+        else
+            msg = msg .. '\n当前现金修改数: ' .. kwargs.cash
+        end
+    end
+    if RB_G.cfgs:get('HEIST', 'cayo_gold_on') then
+        sum_number = sum_number + kwargs.gold
+        if curr_gold == 0 then
+            msg = msg .. '\n当前默认黄金数: ' .. kwargs.gold
+        else
+            msg = msg .. '\n当前黄金修改数: ' .. kwargs.gold
+        end
+    end
+    if sum_number > 8 then
+        _Module.notify(msg, RB_G.lvl.WRN)
+        return true
+    end
+    --             local cash_i = args.get_int('H4LOOT_CASH_I', 0)
+    --             local weed_i = args.get_int('H4LOOT_WEED_I', 0)
+    --             local coke_i = args.get_int('H4LOOT_COKE_I', 0)
+    --             local gold_i = args.get_int('H4LOOT_GOLD_I', 0)
+    --             local cash_c = args.get_int('H4LOOT_CASH_C', 0)
+    --             local weed_c = args.get_int('H4LOOT_WEED_C', 0)
+    --             local coke_c = args.get_int('H4LOOT_COKE_C', 0)
+    --             local gold_c = args.get_int('H4LOOT_GOLD_C', 0)
+    --             local paint = args.get_int('H4LOOT_PAINT', 0)
+    return false
+end
+
+function _Module.is_cayo_point_over_i(kwargs)
+    kwargs = kwargs or {}
+    local curr_cash = RB_G.cfgs:get('HEIST', 'cayo_cash_i_number')
+    local curr_weed = RB_G.cfgs:get('HEIST', 'cayo_weed_number')
+    local curr_coke = RB_G.cfgs:get('HEIST', 'cayo_coke_number')
+    _Module.control_stats(function(args)
+        if RB_G.cfgs:get('HEIST', 'cayo_cash_i_on') then
+            kwargs.cash = curr_cash == 0 and util_num.count_bin_1(args.get_int('H4LOOT_CASH_I', 0)) or curr_cash * 3
+        end
+        if RB_G.cfgs:get('HEIST', 'cayo_weed_on') then
+            kwargs.weed = curr_weed == 0 and util_num.count_bin_1(args.get_int('H4LOOT_WEED_I', 0)) or curr_weed * 3
+        end
+        if RB_G.cfgs:get('HEIST', 'cayo_coke_on') then
+            kwargs.coke = curr_coke == 0 and util_num.count_bin_1(args.get_int('H4LOOT_COKE_I', 0)) or curr_coke * 3
+        end
+    end)
+    local msg = '豪宅外最多可放置 24 个现金/大麻/古柯点'
+    local sum_number = 0
+    if RB_G.cfgs:get('HEIST', 'cayo_cash_i_on') then
+        sum_number = sum_number + kwargs.cash
+        if curr_cash == 0 then
+            msg = msg .. '\n当前默认现金数: ' .. kwargs.cash
+        else
+            msg = msg .. '\n当前现金修改数: ' .. kwargs.cash
+        end
+    end
+    if RB_G.cfgs:get('HEIST', 'cayo_weed_on') then
+        sum_number = sum_number + kwargs.weed
+        if curr_weed == 0 then
+            msg = msg .. '\n当前默认大麻数: ' .. kwargs.weed
+        else
+            msg = msg .. '\n当前大麻修改数: ' .. kwargs.weed
+        end
+    end
+    if RB_G.cfgs:get('HEIST', 'cayo_coke_on') then
+        sum_number = sum_number + kwargs.coke
+        if curr_coke == 0 then
+            msg = msg .. '\n当前默认古柯数: ' .. kwargs.coke
+        else
+            msg = msg .. '\n当前大麻古柯数: ' .. kwargs.coke
+        end
+    end
+    if sum_number > 24 then
+        _Module.notify(msg, RB_G.lvl.WRN)
+        return true
+    end
+    return false
+end
+
+function _Module.mod_cayo_point(point_num, stat, second_data)
+    _Module.control_stats(function(args)
+        local value = 0
+        if point_num == 0 then
+            value = args.get_int(stat, 0)
+        else
+            local point_num = point_num
+            value = _Module.gen_cayo_point(second_data.log, point_num, {
+                max = second_data.max
+            })
+        end
+        second_data.log = second_data.log | value
+        args.set_int(stat, value, true)
+        args.set_int(stat .. '_SCOPED', value, true)
+    end)
+end
+
+function _Module.gen_cayo_point(base, point_num, kwargs)
+    kwargs = kwargs or {}
+    kwargs.max = kwargs.max or util_num.calc_bin_max(base)
+    if base > kwargs.max then
+        util_err.value_error('"base" should be less than or equal to "max"')
+    end
+    local max_num = #util_num.to_bin(kwargs.max)
+    if point_num > max_num then
+        util_err.value_error('"point_num" is too much')
+    end
+    local count_num = 0
+    local is_ok = false
+    local ret = 0
+    while true do
+        for i = 0, max_num - 1 do
+            if 1 << i | base ~= base and math.random(0, max_num) <= point_num then
+                ret = 1 << i | ret
+                base = 1 << i | base
+                count_num = count_num + 1
+            end
+            if count_num >= point_num or base >= kwargs.max then
+                is_ok = true
+                break
+            end
+        end
+        if is_ok then
+            break
+        end
+    end
+    return ret
+end
+
+function _Module.fix_cayo_point()
+    _Module.control_stats(function(args)
+        -- if not RB_G.cfgs:get('HEIST', 'cayo_paint_on') then
+        --     args.set_int('H4LOOT_PAINT', 0, true)
+        --     args.set_int('H4LOOT_PAINT_SCOPED', 0, true)
+        -- end
+        if RB_G.cfgs:get('HEIST', 'cayo_cash_c_on') or RB_G.cfgs:get('HEIST', 'cayo_gold_on') then
+            if not RB_G.cfgs:get('HEIST', 'cayo_cash_c_on') then
+                args.set_int('H4LOOT_CASH_C', 0, true)
+                args.set_int('H4LOOT_CASH_C_SCOPED', 0, true)
+            end
+            if not RB_G.cfgs:get('HEIST', 'cayo_gold_on') then
+                args.set_int('H4LOOT_GOLD_C', 0, true)
+                args.set_int('H4LOOT_GOLD_C_SCOPED', 0, true)
+            end
+        end
+        if RB_G.cfgs:get('HEIST', 'cayo_cash_i_on') or RB_G.cfgs:get('HEIST', 'cayo_weed_on') or
+            RB_G.cfgs:get('HEIST', 'cayo_coke_on') then
+            if not RB_G.cfgs:get('HEIST', 'cayo_cash_i_on') then
+                args.set_int('H4LOOT_CASH_I', 0, true)
+                args.set_int('H4LOOT_CASH_I_SCOPED', 0, true)
+            end
+            if not RB_G.cfgs:get('HEIST', 'cayo_weed_on') then
+                args.set_int('H4LOOT_WEED_I', 0, true)
+                args.set_int('H4LOOT_WEED_I_SCOPED', 0, true)
+            end
+            if not RB_G.cfgs:get('HEIST', 'cayo_coke_on') then
+                args.set_int('H4LOOT_COKE_I', 0, true)
+                args.set_int('H4LOOT_COKE_I_SCOPED', 0, true)
+            end
+        end
+    end)
 end
 
 function _Module.request_model(hash, kwargs)
