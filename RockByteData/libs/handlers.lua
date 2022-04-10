@@ -745,6 +745,7 @@ end
 
 function _Module.heist_cayo_enable(feat)
     -- 这个函数逻辑搞得太复杂了，短期不再继续修改
+    RB_U.notify('操作中请稍后', RB_G.lvl.INF)
     if RB_U.is_cayo_point_over_c() or RB_U.is_cayo_point_over_i() then
         RB_U.notify('操作取消!请修正数据后继续', RB_G.lvl.WRN)
         return
@@ -844,10 +845,10 @@ end
 
 function _Module.setting_reset(feat, kwargs)
     kwargs = kwargs or {}
-    kwargs.enforce = kwargs.enforce or false
+    kwargs.enforce = kwargs.enforce == nil and true or kwargs.enforce
     for _, val in ipairs({{'PROG', 'debug', false}, {'TELE', 'flash_distance', 3}, {'TELE', 'auto_teleport', false},
                           {'MNTR', 'modder_monitor_enable', false}, {'MNTR', 'display', false},
-                          {'MNTR', 'log_enable', true}, {'MNTR', 'size', 12}, {'MNTR', 'col_number', 16},
+                          {'MNTR', 'log_enable', false}, {'MNTR', 'size', 12}, {'MNTR', 'col_number', 16},
                           {'MNTR', 'col_height', 1.5}, {'MNTR', 'red', 255}, {'MNTR', 'green', 255},
                           {'MNTR', 'blue', 255}, {'MNTR', 'alpha', 255}, {'MNTR', 'sleep', 5000},
                           {'WRLD', 'npcs_kill', false}, {'WRLD', 'npcs_remove', false}, {'WRLD', 'accuracy', 50},
@@ -872,7 +873,10 @@ function _Module.setting_reset(feat, kwargs)
             RB_G.cfgs:set(val[1], val[2], val[3])
         end
     end
-    RB_U.notify('设置配置成功', RB_G.lvl.SUC)
+    if kwargs.enforce then
+        RB_G.cfgs:save()
+    end
+    RB_U.notify('设置配置成功,请重新加载脚本', RB_G.lvl.SUC)
 end
 
 function _Module.setting_save(feat)

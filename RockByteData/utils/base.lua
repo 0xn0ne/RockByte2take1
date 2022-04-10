@@ -131,5 +131,4 @@ function _Module.calc_distance(point_a, point_b)
     end
 end
 
-
 return _Module

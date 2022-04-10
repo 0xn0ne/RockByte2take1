@@ -71,7 +71,9 @@ end
 
 -- 初始化配置文件
 RB_G.cfgs = util_ini:new(paths.configs)
-RB_H.setting_reset()
+RB_H.setting_reset(nil, {
+    enforce = false
+})
 
 -- 目录记录到全局变量中
 for k, v in pairs(paths) do
