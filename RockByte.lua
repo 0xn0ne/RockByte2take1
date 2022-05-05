@@ -223,7 +223,7 @@ RB_U.menus_add({'heist', '抢劫选项', 'parent', 'main'}, {'heist_apartment', 
     {'heist_casino', '名钻赌场', 'parent', 'heist'},
     {'heist_casino_cut', '修改分红', 'action', 'heist_casino', RB_H.heist_casino_cut},
     {'heist_cayo', '佩里科岛', 'parent', 'heist'},
-    {'heist_cayo_cut', '修改分红', 'action', 'heist_cayo', RB_H.heist_cayo_cut},
+    -- {'heist_cayo_cut', '修改分红', 'action', 'heist_cayo', RB_H.heist_cayo_cut},
     {'heist_cayo_mode', '模式', 'value_str', 'heist_cayo', RB_H.heist_cayo_mode},
     {'heist_cayo_target', '目标', 'value_str', 'heist_cayo', RB_H.heist_cayo_target},
     {'heist_cayo_c_cash', '现金数量(内)', 'value_str', 'heist_cayo', RB_H.heist_cayo_c_cash},
@@ -236,7 +236,8 @@ RB_U.menus_add({'heist', '抢劫选项', 'parent', 'main'}, {'heist_apartment', 
     {'heist_cayo_weapon', '武器', 'value_str', 'heist_cayo', RB_H.heist_cayo_weapon},
     {'heist_cayo_truck', '卡车位置', 'value_str', 'heist_cayo', RB_H.heist_cayo_truck},
     {'heist_cayo_interest', '侦察兴趣点', 'toggle', 'heist_cayo', RB_H.heist_cayo_interest},
-    {'heist_cayo_disturb', '全部干扰', 'toggle', 'heist_cayo', RB_H.heist_cayo_disturb},
+    {'heist_cayo_pretask', '完成前置', 'toggle', 'heist_cayo', RB_H.heist_cayo_pretask},
+    {'heist_cayo_disturb', '完成干扰', 'toggle', 'heist_cayo', RB_H.heist_cayo_disturb},
     {'heist_cayo_enable', '确认修改', 'action', 'heist_cayo', RB_H.heist_cayo_enable},
     {'heist_doomsday', '末日豪劫', 'parent', 'heist'},
     {'heist_doomsday_cut', '修改分红', 'action', 'heist_doomsday', RB_H.heist_doomsday_cut})
@@ -291,6 +292,8 @@ RB_U.menus_set({'heist_cayo_mode', {
     str_data = {'机场', '北船坞', '主码头-东', '主码头-西', '豪宅门口'},
     value = RB_G.cfgs:get('HEIST', 'cayo_truck'),
     on = RB_G.cfgs:get('HEIST', 'cayo_truck_on')
+}}, {'heist_cayo_pretask', {
+    on = RB_G.cfgs:get('HEIST', 'cayo_pretask_on')
 }}, {'heist_cayo_disturb', {
     on = RB_G.cfgs:get('HEIST', 'cayo_disturb_on')
 }}, {'heist_cayo_interest', {

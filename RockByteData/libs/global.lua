@@ -205,6 +205,10 @@ _Module.eve.n2h = {
     bounty = 1294995624
 }
 
+_Module.eve.crs = {
+    kek = {962740265, -1386010354, 2112408256, 677240627}
+}
+
 _Module.cra_typ = {'kek', 'mmt'}
 
 _Module.heist = {}

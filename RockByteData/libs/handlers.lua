@@ -165,7 +165,7 @@ function _Module.online_remove_god(feat, pid)
         return
     end
     while feat.on do
-        RB_U.send_script_event(801199324, pid, {801199324, pid, 869796886})
+        RB_U.send_script_event(801199324, pid, {pid, 869796886, 0})
         system.yield(10)
     end
 end
@@ -735,6 +735,10 @@ function _Module.heist_cayo_truck(feat)
     RB_G.cfgs:set('HEIST', 'cayo_truck_on', feat.on)
 end
 
+function _Module.heist_cayo_pretask(feat)
+    RB_G.cfgs:set('HEIST', 'cayo_pretask_on', feat.on)
+end
+
 function _Module.heist_cayo_disturb(feat)
     RB_G.cfgs:set('HEIST', 'cayo_disturb_on', feat.on)
 end
@@ -746,6 +750,21 @@ end
 function _Module.heist_cayo_enable(feat)
     -- 这个函数逻辑搞得太复杂了，短期不再继续修改
     RB_U.notify('操作中请稍后', RB_G.lvl.INF)
+    local is_exit = false
+    RB_U.control_stats(function(args)
+        if args.get_int('H4_PROGRESS', 0) % 2 == 0 then
+            is_exit = true
+        end
+    end)
+    if is_exit then
+        RB_U.notify('请支付准备任务金额后再使用', RB_G.lvl.WRN)
+        return
+    end
+
+    if RB_U.is_cayo_point_over_c() or RB_U.is_cayo_point_over_i() then
+        RB_U.notify('操作取消!请修正数据后继续', RB_G.lvl.WRN)
+        return
+    end
     if RB_U.is_cayo_point_over_c() or RB_U.is_cayo_point_over_i() then
         RB_U.notify('操作取消!请修正数据后继续', RB_G.lvl.WRN)
         return
@@ -755,8 +774,12 @@ function _Module.heist_cayo_enable(feat)
     local is_edited = false
     if RB_G.cfgs:get('HEIST', 'cayo_mode_on') then
         RB_U.control_stats(function(args)
-            local value = RB_G.heist.cayo.mode[RB_G.cfgs:get('HEIST', 'cayo_mode') + 1]
-            return args.set_int('H4_PROGRESS', value, true)
+            local h4_pro = args.get_int('H4_PROGRESS', 0)
+            if RB_G.cfgs:get('HEIST', 'cayo_mode') == 0 then
+                return args.set_int('H4_PROGRESS', h4_pro & 126975, true)
+            elseif RB_G.cfgs:get('HEIST', 'cayo_mode') == 1 then
+                return args.set_int('H4_PROGRESS', h4_pro | 4096, true)
+            end
         end)
         is_edited = true
     end
@@ -807,6 +830,10 @@ function _Module.heist_cayo_enable(feat)
     end
     if RB_G.cfgs:get('HEIST', 'cayo_weapon_on') then
         RB_U.control_stats(function(args)
+            local h4_mis = args.get_int('H4_MISSIONS', 0)
+            args.set_int('H4_MISSIONS', h4_mis | 4096, true)
+            local h4_pro = args.get_int('H4_PROGRESS', 0)
+            args.set_int('H4_PROGRESS', h4_pro | 16384, true)
             return args.set_int('H4CNF_WEAPONS', RB_G.cfgs:get('HEIST', 'cayo_weapon') + 1, true)
         end)
         is_edited = true
@@ -819,16 +846,22 @@ function _Module.heist_cayo_enable(feat)
     end
     if RB_G.cfgs:get('HEIST', 'cayo_interest_on') then
         RB_U.control_stats(function(args)
-            -- args.set_int('H4CNF_GRAPPEL', -1, true) -- 位置点没有修改的必要
-            -- args.set_int('H4CNF_UNIFORM', -1, true) -- 位置点没有修改的必要
-            -- args.set_int('H4CNF_BOLTCUT', -1, true) -- 位置点没有修改的必要
             args.set_int('H4CNF_BS_GEN', 126975, true)
             args.set_int('H4CNF_BS_ABIL', 63, true)
         end)
         is_edited = true
     end
+    if RB_G.cfgs:get('HEIST', 'cayo_pretask_on') then
+        RB_U.control_stats(function(args)
+            local h4_mis = args.get_int('H4_MISSIONS', 0)
+            args.set_int('H4_MISSIONS', h4_mis | 3840, true)
+        end)
+        is_edited = true
+    end
     if RB_G.cfgs:get('HEIST', 'cayo_disturb_on') then
         RB_U.control_stats(function(args)
+            local h4_mis = args.get_int('H4_MISSIONS', 0)
+            args.set_int('H4_MISSIONS', h4_mis | 57344, true)
             args.set_int('H4CNF_WEP_DISRP', 3, true)
             args.set_int('H4CNF_ARM_DISRP', 3, true)
             args.set_int('H4CNF_HEL_DISRP', 3, true)
@@ -867,8 +900,8 @@ function _Module.setting_reset(feat, kwargs)
                           {'HEIST', 'cayo_paint_on', false}, {'HEIST', 'cayo_vehicle', 0},
                           {'HEIST', 'cayo_vehicle_on', false}, {'HEIST', 'cayo_weapon', 0},
                           {'HEIST', 'cayo_weapon_on', false}, {'HEIST', 'cayo_truck', 0},
-                          {'HEIST', 'cayo_truck_on', false}, {'HEIST', 'cayo_disturb_on', false},
-                          {'HEIST', 'cayo_interest_on', false}}) do
+                          {'HEIST', 'cayo_truck_on', false}, {'HEIST', 'cayo_pretask_on', false},
+                          {'HEIST', 'cayo_disturb_on', false}, {'HEIST', 'cayo_interest_on', false}}) do
         if RB_G.cfgs:get(val[1], val[2]) == nil or kwargs.enforce then
             RB_G.cfgs:set(val[1], val[2], val[3])
         end

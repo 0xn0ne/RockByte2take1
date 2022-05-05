@@ -43,3 +43,5 @@ luac.out
 *.ini
 *.log
 
+# other files
+.history*
