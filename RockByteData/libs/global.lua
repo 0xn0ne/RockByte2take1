@@ -213,7 +213,6 @@ _Module.cra_typ = {'kek', 'mmt'}
 
 _Module.heist = {}
 _Module.heist.cayo = {}
-_Module.heist.cayo.vehicle = {65283, 65413, 65289, 65425, 65313, 65345, 65535}
 _Module.heist.cayo.second_i = {
     log = 0,
     max = 16777215

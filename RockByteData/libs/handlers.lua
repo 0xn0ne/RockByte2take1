@@ -765,10 +765,6 @@ function _Module.heist_cayo_enable(feat)
         RB_U.notify('操作取消!请修正数据后继续', RB_G.lvl.WRN)
         return
     end
-    if RB_U.is_cayo_point_over_c() or RB_U.is_cayo_point_over_i() then
-        RB_U.notify('操作取消!请修正数据后继续', RB_G.lvl.WRN)
-        return
-    end
     RB_G.heist.cayo.second_i.log = 0
     RB_G.heist.cayo.second_c.log = 0
     local is_edited = false
@@ -823,8 +819,9 @@ function _Module.heist_cayo_enable(feat)
     end
     if RB_G.cfgs:get('HEIST', 'cayo_vehicle_on') then
         RB_U.control_stats(function(args)
-            local value = RB_G.heist.cayo.vehicle[RB_G.cfgs:get('HEIST', 'cayo_vehicle') + 1]
-            return args.set_int('H4_MISSIONS', value, true)
+            local vehicle = {2, 132, 8, 144, 32, 64}
+            local h4_mis = args.get_int('H4_MISSIONS', 0)
+            return args.set_int('H4_MISSIONS', h4_mis | vehicle[RB_G.cfgs:get('HEIST', 'cayo_vehicle') + 1], true)
         end)
         is_edited = true
     end
@@ -862,6 +859,8 @@ function _Module.heist_cayo_enable(feat)
         RB_U.control_stats(function(args)
             local h4_mis = args.get_int('H4_MISSIONS', 0)
             args.set_int('H4_MISSIONS', h4_mis | 57344, true)
+            local h4_pro = args.get_int('H4_PROGRESS', 0)
+            args.set_int('H4_PROGRESS', h4_pro | 16384, true)
             args.set_int('H4CNF_WEP_DISRP', 3, true)
             args.set_int('H4CNF_ARM_DISRP', 3, true)
             args.set_int('H4CNF_HEL_DISRP', 3, true)

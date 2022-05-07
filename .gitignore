@@ -45,3 +45,4 @@ luac.out
 
 # other files
 .history*
+autoexec.lua
