@@ -206,10 +206,10 @@ _Module.eve.n2h = {
 }
 
 _Module.eve.crs = {
-    kek = {962740265, -1386010354, 2112408256, 677240627}
+    kek = { 962740265, -1386010354, 2112408256, 677240627 }
 }
 
-_Module.cra_typ = {'kek', 'mmt'}
+_Module.cra_typ = { 'kek', 'mmt' }
 
 _Module.heist = {}
 _Module.heist.cayo = {}

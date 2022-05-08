@@ -54,7 +54,7 @@ function _Module.loop(feat)
         --     }
         -- end
         local ply_is_idle_moved = old_ply_info ~= nil and ply_info.coords == old_ply_info.coords and
-                                      old_ply_info.heading == ply_info.heading
+            old_ply_info.heading == ply_info.heading
 
         ply_info.marks = {} -- 用来保存用户状态标记
         ply_info.god_log = old_ply_info and old_ply_info.god_log or -1
@@ -117,7 +117,7 @@ function _Module.online_to_cayo(feat, pid)
     end
     RB_U.notify('开始操作,请稍后', RB_G.lvl.INF)
     RB_U.send_script_event_by_name(RB_G.eve.nme.send_to_perico_island, pid,
-        {pid, RB_G.eve.n2h.send_to_perico_island, 0, 0})
+        { pid, RB_G.eve.n2h.send_to_perico_island, 0, 0 })
     RB_U.notify('操作完成', RB_G.lvl.SUC)
 end
 
@@ -127,7 +127,7 @@ function _Module.online_to_apartment(feat, pid)
         return
     end
     RB_U.notify('开始操作,请稍后', RB_G.lvl.INF)
-    RB_U.send_script_event_by_name(RB_G.eve.nme.send_to_eclipse, pid, {pid, pid, -1, 0, 128, 1, 1, 20})
+    RB_U.send_script_event_by_name(RB_G.eve.nme.send_to_eclipse, pid, { pid, pid, -1, 0, 128, 1, 1, 20 })
     RB_U.notify('操作完成', RB_G.lvl.SUC)
 end
 
@@ -165,7 +165,7 @@ function _Module.online_remove_god(feat, pid)
         return
     end
     while feat.on do
-        RB_U.send_script_event(801199324, pid, {pid, 869796886, 0})
+        RB_U.send_script_event(801199324, pid, { pid, 869796886, 0 })
         system.yield(10)
     end
 end
@@ -385,12 +385,12 @@ function _Module.stat_addt(feat)
         RB_U.notify(
             '如果你是第一次知道这个东西或者你不知道这个东西的作用和后果请不要继续.乱改时间有可能导致封号!\n修改方式是在原来在线时间的基础上增加指定的在线时长.该操作会修改这两个值"GTA在线模式中花费的时间"和当前"角色使用时间"',
             RB_G.lvl.INF, {
-                seconds = 30
-            })
+            seconds = 30
+        })
         return
     end
-    local time_ms = {3600000, 3600000 * 24, 3600000 * 24 * 7, 3600000 * 24 * 30, 3600000 * 24 * 30 * 3,
-                     3600000 * 24 * 30 * 6, 3600000 * 24 * 30 * 12}
+    local time_ms = { 3600000, 3600000 * 24, 3600000 * 24 * 7, 3600000 * 24 * 30, 3600000 * 24 * 30 * 3,
+        3600000 * 24 * 30 * 6, 3600000 * 24 * 30 * 12 }
     local playing_ms
     local mp_total_ms
     if not RB_U.control_stats(function(args)
@@ -407,10 +407,10 @@ function _Module.stat_addt(feat)
         return
     end
     local playing_time = util_tim.date2string(util_tim.ms2date(playing_ms, {
-        only = {util_tim.day, util_tim.hor, util_tim.min, util_tim.sec}
+        only = { util_tim.day, util_tim.hor, util_tim.min, util_tim.sec }
     }))
     local mp_total_time = util_tim.date2string(util_tim.ms2date(mp_total_ms, {
-        only = {util_tim.day, util_tim.hor, util_tim.min, util_tim.sec}
+        only = { util_tim.day, util_tim.hor, util_tim.min, util_tim.sec }
     }))
     RB_U.notify(string.format(
         '操作成功!\n当前游戏在线时间为: %s\n当前角色使用时间为: %s\n请使用ALT+F4并等待右下角圆圈消失后完成保存',
@@ -422,12 +422,12 @@ function _Module.stat_rdct(feat)
         RB_U.notify(
             '如果你是第一次知道这个东西或者你不知道这个东西的作用和后果请不要继续, 乱改时间有可能导致封号!\n修改方式是在原来在线时间的基础上减少指定的在线时长. 该操作会修改这两个值 "GTA在线模式中花费的时间" 和当前 "角色使用时间"',
             RB_G.lvl.INF, {
-                seconds = 30
-            })
+            seconds = 30
+        })
         return
     end
-    local time_ms = {3600000, 3600000 * 24, 3600000 * 24 * 7, 3600000 * 24 * 30, 3600000 * 24 * 30 * 3,
-                     3600000 * 24 * 30 * 6, 3600000 * 24 * 30 * 12}
+    local time_ms = { 3600000, 3600000 * 24, 3600000 * 24 * 7, 3600000 * 24 * 30, 3600000 * 24 * 30 * 3,
+        3600000 * 24 * 30 * 6, 3600000 * 24 * 30 * 12 }
     local playing_ms
     local mp_total_ms
     if not RB_U.control_stats(function(args)
@@ -449,10 +449,10 @@ function _Module.stat_rdct(feat)
         return
     end
     local playing_time = util_tim.date2string(util_tim.ms2date(playing_ms, {
-        only = {util_tim.day, util_tim.hor, util_tim.min, util_tim.sec}
+        only = { util_tim.day, util_tim.hor, util_tim.min, util_tim.sec }
     }))
     local mp_total_time = util_tim.date2string(util_tim.ms2date(mp_total_ms, {
-        only = {util_tim.day, util_tim.hor, util_tim.min, util_tim.sec}
+        only = { util_tim.day, util_tim.hor, util_tim.min, util_tim.sec }
     }))
     RB_U.notify(string.format(
         '操作成功!\n当前游戏在线时间为: %s\n当前角色使用时间为: %s\n请使用ALT+F4并等待右下角圆圈消失后完成保存',
@@ -558,7 +558,7 @@ function _Module.heist_apartment_cut(feat)
         end
     end
     local payment = tonumber(data)
-    script.set_global_i(1934631 + 3008 + 1, payment)
+    script.set_global_i(1937645, payment)
 end
 
 function _Module.heist_casino_cut(feat)
@@ -575,7 +575,7 @@ function _Module.heist_casino_cut(feat)
     end
     local payment = tonumber(data)
     for i = 1, player.player_count() do
-        script.set_global_i(1966718 + 2325 + i, payment)
+        script.set_global_i(1969065 + i, payment)
     end
 end
 
@@ -593,7 +593,7 @@ function _Module.heist_doomsday_cut(feat)
     end
     local payment = tonumber(data)
     for i = 1, player.player_count() do
-        script.set_global_i(1962755 + 812 + 50 + i, payment)
+        script.set_global_i(1963625 + i, payment)
     end
 end
 
@@ -609,7 +609,7 @@ function _Module.refresh_chat_judge_keywords()
             index = index,
             value = value
         }
-        RB_G.menu.char_judg_keys[index]:set_str_data({'修改', '删除'})
+        RB_G.menu.char_judg_keys[index]:set_str_data({ '修改', '删除' })
     end
 end
 
@@ -627,13 +627,17 @@ function _Module.heist_cayo_cut(feat)
     end
     local payment = tonumber(data)
     for i = 1, player.player_count() do
-        script.set_global_i(1973496 + 823 + 56 + i, payment)
+        script.set_global_i(1974404 + i, payment)
     end
 end
 
 function _Module.heist_cayo_mode(feat)
     RB_G.cfgs:set('HEIST', 'cayo_mode', feat.value)
     RB_G.cfgs:set('HEIST', 'cayo_mode_on', feat.on)
+end
+
+function _Module.heist_cayo_pretask(feat)
+    RB_G.cfgs:set('HEIST', 'cayo_pretask_on', feat.on)
 end
 
 function _Module.heist_cayo_target(feat)
@@ -735,10 +739,6 @@ function _Module.heist_cayo_truck(feat)
     RB_G.cfgs:set('HEIST', 'cayo_truck_on', feat.on)
 end
 
-function _Module.heist_cayo_pretask(feat)
-    RB_G.cfgs:set('HEIST', 'cayo_pretask_on', feat.on)
-end
-
 function _Module.heist_cayo_disturb(feat)
     RB_G.cfgs:set('HEIST', 'cayo_disturb_on', feat.on)
 end
@@ -776,6 +776,13 @@ function _Module.heist_cayo_enable(feat)
             elseif RB_G.cfgs:get('HEIST', 'cayo_mode') == 1 then
                 return args.set_int('H4_PROGRESS', h4_pro | 4096, true)
             end
+        end)
+        is_edited = true
+    end
+    if RB_G.cfgs:get('HEIST', 'cayo_pretask_on') then
+        RB_U.control_stats(function(args)
+            local h4_mis = args.get_int('H4_MISSIONS', 0)
+            args.set_int('H4_MISSIONS', h4_mis | 3841, true)
         end)
         is_edited = true
     end
@@ -819,7 +826,7 @@ function _Module.heist_cayo_enable(feat)
     end
     if RB_G.cfgs:get('HEIST', 'cayo_vehicle_on') then
         RB_U.control_stats(function(args)
-            local vehicle = {2, 132, 8, 144, 32, 64}
+            local vehicle = { 2, 132, 8, 144, 32, 64, 254 }
             local h4_mis = args.get_int('H4_MISSIONS', 0)
             return args.set_int('H4_MISSIONS', h4_mis | vehicle[RB_G.cfgs:get('HEIST', 'cayo_vehicle') + 1], true)
         end)
@@ -848,13 +855,6 @@ function _Module.heist_cayo_enable(feat)
         end)
         is_edited = true
     end
-    if RB_G.cfgs:get('HEIST', 'cayo_pretask_on') then
-        RB_U.control_stats(function(args)
-            local h4_mis = args.get_int('H4_MISSIONS', 0)
-            args.set_int('H4_MISSIONS', h4_mis | 3840, true)
-        end)
-        is_edited = true
-    end
     if RB_G.cfgs:get('HEIST', 'cayo_disturb_on') then
         RB_U.control_stats(function(args)
             local h4_mis = args.get_int('H4_MISSIONS', 0)
@@ -878,29 +878,29 @@ end
 function _Module.setting_reset(feat, kwargs)
     kwargs = kwargs or {}
     kwargs.enforce = kwargs.enforce == nil and true or kwargs.enforce
-    for _, val in ipairs({{'PROG', 'debug', false}, {'TELE', 'flash_distance', 3}, {'TELE', 'auto_teleport', false},
-                          {'MNTR', 'modder_monitor_enable', false}, {'MNTR', 'display', false},
-                          {'MNTR', 'log_enable', false}, {'MNTR', 'size', 12}, {'MNTR', 'col_number', 16},
-                          {'MNTR', 'col_height', 1.5}, {'MNTR', 'red', 255}, {'MNTR', 'green', 255},
-                          {'MNTR', 'blue', 255}, {'MNTR', 'alpha', 255}, {'MNTR', 'sleep', 5000},
-                          {'WRLD', 'npcs_kill', false}, {'WRLD', 'npcs_remove', false}, {'WRLD', 'accuracy', 50},
-                          {'WRLD', 'accuracy_on', false}, {'WRLD', 'npcs_freeze', false},
-                          {'WRLD', 'npcs_teleport_to_me', false}, {'WRLD', 'combat_ability', 0},
-                          {'WRLD', 'combat_ability_on', false}, {'WRLD', 'control_range', 100},
-                          {'CHAR', 'chat_judge_notice', true}, {'CHAR', 'chat_judge_type', 0},
-                          {'CHAR', 'chat_judge_keywords', 'www%., GTA%d%d%d, 刷金, q群, 售后, 微信, 淘宝, vx'},
-                          {'HEIST', 'cayo_mode', 0}, {'HEIST', 'cayo_mode_on', false}, {'HEIST', 'cayo_target', 0},
-                          {'HEIST', 'cayo_target_on', false}, {'HEIST', 'cayo_cash_c_number', 0},
-                          {'HEIST', 'cayo_cash_c_on', false}, {'HEIST', 'cayo_cash_i_number', 0},
-                          {'HEIST', 'cayo_cash_i_on', false}, {'HEIST', 'cayo_weed_number', 0},
-                          {'HEIST', 'cayo_weed_on', false}, {'HEIST', 'cayo_coke_number', 0},
-                          {'HEIST', 'cayo_coke_on', false}, {'HEIST', 'cayo_gold_number', 0},
-                          {'HEIST', 'cayo_gold_on', false}, {'HEIST', 'cayo_paint_number', 0},
-                          {'HEIST', 'cayo_paint_on', false}, {'HEIST', 'cayo_vehicle', 0},
-                          {'HEIST', 'cayo_vehicle_on', false}, {'HEIST', 'cayo_weapon', 0},
-                          {'HEIST', 'cayo_weapon_on', false}, {'HEIST', 'cayo_truck', 0},
-                          {'HEIST', 'cayo_truck_on', false}, {'HEIST', 'cayo_pretask_on', false},
-                          {'HEIST', 'cayo_disturb_on', false}, {'HEIST', 'cayo_interest_on', false}}) do
+    for _, val in ipairs({ { 'PROG', 'debug', false }, { 'TELE', 'flash_distance', 3 }, { 'TELE', 'auto_teleport', false },
+        { 'MNTR', 'modder_monitor_enable', false }, { 'MNTR', 'display', false },
+        { 'MNTR', 'log_enable', false }, { 'MNTR', 'size', 12 }, { 'MNTR', 'col_number', 16 },
+        { 'MNTR', 'col_height', 1.5 }, { 'MNTR', 'red', 255 }, { 'MNTR', 'green', 255 },
+        { 'MNTR', 'blue', 255 }, { 'MNTR', 'alpha', 255 }, { 'MNTR', 'sleep', 5000 },
+        { 'WRLD', 'npcs_kill', false }, { 'WRLD', 'npcs_remove', false }, { 'WRLD', 'accuracy', 50 },
+        { 'WRLD', 'accuracy_on', false }, { 'WRLD', 'npcs_freeze', false },
+        { 'WRLD', 'npcs_teleport_to_me', false }, { 'WRLD', 'combat_ability', 0 },
+        { 'WRLD', 'combat_ability_on', false }, { 'WRLD', 'control_range', 100 },
+        { 'CHAR', 'chat_judge_notice', true }, { 'CHAR', 'chat_judge_type', 0 },
+        { 'CHAR', 'chat_judge_keywords', 'www%., GTA%d%d%d, 刷金, q群, 售后, 微信, 淘宝, vx' },
+        { 'HEIST', 'cayo_mode', 0 }, { 'HEIST', 'cayo_mode_on', false }, { 'HEIST', 'cayo_target', 0 },
+        { 'HEIST', 'cayo_target_on', false }, { 'HEIST', 'cayo_cash_c_number', 0 },
+        { 'HEIST', 'cayo_cash_c_on', false }, { 'HEIST', 'cayo_cash_i_number', 0 },
+        { 'HEIST', 'cayo_cash_i_on', false }, { 'HEIST', 'cayo_weed_number', 0 },
+        { 'HEIST', 'cayo_weed_on', false }, { 'HEIST', 'cayo_coke_number', 0 },
+        { 'HEIST', 'cayo_coke_on', false }, { 'HEIST', 'cayo_gold_number', 0 },
+        { 'HEIST', 'cayo_gold_on', false }, { 'HEIST', 'cayo_paint_number', 0 },
+        { 'HEIST', 'cayo_paint_on', false }, { 'HEIST', 'cayo_vehicle', 0 },
+        { 'HEIST', 'cayo_vehicle_on', false }, { 'HEIST', 'cayo_weapon', 0 },
+        { 'HEIST', 'cayo_weapon_on', false }, { 'HEIST', 'cayo_truck', 0 },
+        { 'HEIST', 'cayo_truck_on', false }, { 'HEIST', 'cayo_pretask_on', false },
+        { 'HEIST', 'cayo_disturb_on', false }, { 'HEIST', 'cayo_interest_on', false } }) do
         if RB_G.cfgs:get(val[1], val[2]) == nil or kwargs.enforce then
             RB_G.cfgs:set(val[1], val[2], val[3])
         end

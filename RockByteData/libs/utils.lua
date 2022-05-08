@@ -22,7 +22,7 @@ function _Module.menu_get_last_menu(keys, kwargs)
             util_err.value_error('this menu "' .. curr_keys .. '" does not exist')
         end
     end
-    return table.unpack({menus, tbl_keys[#tbl_keys]})
+    return table.unpack({ menus, tbl_keys[#tbl_keys] })
 end
 
 function _Module.menu_set(keys, kwargs)
@@ -60,20 +60,20 @@ function _Module.menu_add(keys, name, t_feat, p_keys, func)
     elseif type(p_keys) == 'number' then
         p_id = p_keys
     else
-        util_err.is_not_type_error({'number', 'string'}, p_keys)
+        util_err.is_not_type_error({ 'number', 'string' }, p_keys)
     end
     last_menu[key] = menu.add_feature(name, t_feat, p_id, func)
 end
 
 function _Module.menus_set(...)
-    local tbls = {...}
+    local tbls = { ... }
     for _, properties in pairs(tbls) do
         _Module.menu_set(properties[1], properties[2])
     end
 end
 
 function _Module.menus_add(...)
-    local tbls = {...}
+    local tbls = { ... }
     for _, f_info in pairs(tbls) do
         local func = #f_info > 4 and f_info[5] or nil
         _Module.menu_add(f_info[1], f_info[2], f_info[3], f_info[4], func)
@@ -454,11 +454,11 @@ function _Module.game_crashes_mmt(target_pid)
     end
     -- system.wait(2000)
     -- entity.set_entity_coords_no_offset(self_player.ped, targ_player.coords)
-    script.trigger_script_event(-2113023004, targ_player.id, {-1, -1, 0, 0, -20, 1000})
-    script.trigger_script_event(-1056683619, targ_player.id, {-1, -1})
-    script.trigger_script_event(1757755807, targ_player.id, {-1, -1})
-    script.trigger_script_event(1258808115, targ_player.id, {-1, -1})
-    script.trigger_script_event(-786546101, targ_player.id, {-1, -1})
+    script.trigger_script_event(-2113023004, targ_player.id, { -1, -1, 0, 0, -20, 1000 })
+    script.trigger_script_event(-1056683619, targ_player.id, { -1, -1 })
+    script.trigger_script_event(1757755807, targ_player.id, { -1, -1 })
+    script.trigger_script_event(1258808115, targ_player.id, { -1, -1 })
+    script.trigger_script_event(-786546101, targ_player.id, { -1, -1 })
     -- system.wait(3000)
     network.force_remove_player(targ_player.id)
 
@@ -468,15 +468,15 @@ end
 
 function _Module.game_crashes_kek(target_pid)
     for i = 1, 19 do
-        local parameters = {target_pid, -1774405356, math.random(0, 4), math.random(0, 1)}
+        local parameters = { target_pid, -1774405356, math.random(0, 4), math.random(0, 1) }
         for i = 5, 13 do
             parameters[#parameters + 1] = math.random(-2147483647, 2147483647)
         end
         parameters[10] = target_pid
         _Module.send_script_event(677240627, target_pid, parameters)
     end
-    for _, script_hash in ipairs({962740265, -1386010354, 2112408256, 677240627}) do
-        local parameters = {target_pid}
+    for _, script_hash in ipairs({ 962740265, -1386010354, 2112408256, 677240627 }) do
+        local parameters = { target_pid }
         for i = 2, 10 do
             parameters[#parameters + 1] = math.random(-2147483647, 2147483647)
         end
@@ -487,7 +487,7 @@ end
 
 function _Module.get_all_attached_entities(entity_id, entities)
     local entities = entities or {}
-    for _, all_entities in pairs({vehicle.get_all_vehicles(), ped.get_all_peds(), object.get_all_objects()}) do
+    for _, all_entities in pairs({ vehicle.get_all_vehicles(), ped.get_all_peds(), object.get_all_objects() }) do
         for i = 1, #all_entities do
             if entity.get_entity_attached_to(all_entities[i]) == entity_id and
                 not (entity.is_entity_a_ped(all_entities[i]) or ped.is_ped_a_player(all_entities[i])) then
@@ -508,7 +508,7 @@ end
 
 function _Module.clear_entities_and_attached(entities_id)
     if type(entities_id) == "number" then
-        entities_id = {entities_id}
+        entities_id = { entities_id }
     end
     for _, entity_id in ipairs(entities_id) do
         if not entity.is_an_entity(entity_id) then
@@ -526,7 +526,7 @@ end
 function _Module.clear_entities(entities_id)
     kwargs = kwargs or {}
     if type(entities_id) == "number" then
-        entities_id = {entities_id}
+        entities_id = { entities_id }
     end
 
     for _, entity_id in ipairs(entities_id) do
@@ -580,30 +580,37 @@ function _Module.text_layout:new(size, col_number, hei_mul, o)
     self.hei_mul = hei_mul or 1 -- 行高倍数
     return o
 end
+
 function _Module.text_layout:set(size, number, multiplier)
     self.size = size
     self.col_number = number
     self.hei_mul = multiplier
     -- ui.set_text_scale(self.size * 0.02)
 end
+
 function _Module.text_layout:set_size(size)
     self.size = size
     -- ui.set_text_scale(self.size * 0.02)
 end
+
 function _Module.text_layout:set_col_n(number)
     self.col_number = number
 end
+
 function _Module.text_layout:set_hei_h(multiplier)
     self.hei_mul = multiplier
 end
+
 function _Module.text_layout:gen_x(index)
     index = index or 0
     return 1 / self.col_number * index
 end
+
 function _Module.text_layout:gen_y(index)
     index = index or 0
     return self.size / 800 * self.hei_mul * index
 end
+
 function _Module.text_layout:draw(content, row_idx, col_idx)
     ui.set_text_scale(self.size * 0.02)
     ui.draw_text(content, v2(self:gen_x(row_idx), self:gen_y(col_idx)))
@@ -612,9 +619,11 @@ end
 function _Module.is_online()
     return stats.stat_get_u64(gameplay.get_hash_key("MP_PLAYING_TIME")) ~= 0
 end
+
 function _Module.get_mp_index()
     return stats.stat_get_int(gameplay.get_hash_key("MPPLY_LAST_MP_CHAR"), 0)
 end
+
 function _Module.get_stat_hash(stat_name, kwargs)
     kwargs = kwargs or {}
     if type(stat_name) == 'number' then
@@ -630,6 +639,7 @@ function _Module.get_stat_hash(stat_name, kwargs)
     assert(ret ~= 0, string.format('The hash value of "%s" does not exist', kwargs.name))
     return ret
 end
+
 function _Module.control_stats(control_func, kwargs)
     kwargs = kwargs or {}
     kwargs.delay = kwargs.delay or 250
@@ -686,6 +696,7 @@ function _Module.control_stats(control_func, kwargs)
     system.yield(kwargs.delay)
     return ret
 end
+
 function _Module.get_stat_by_name(type_val, name, kwargs)
     kwargs = kwargs or {}
     if type_val ~= RB_G.sta_typ.i64 and type_val ~= RB_G.sta_typ.u64 then
@@ -705,6 +716,7 @@ function _Module.get_stat_by_name(type_val, name, kwargs)
     end
     return ret
 end
+
 function _Module.set_stat_by_name(type_val, name, value, kwargs)
     kwargs = kwargs or {}
     kwargs.delay = kwargs.delay or 250
@@ -739,7 +751,7 @@ function _Module.is_cayo_point_over_c(kwargs)
     _Module.control_stats(function(args)
         if RB_G.cfgs:get('HEIST', 'cayo_paint_on') then
             kwargs.paint = curr_paint == 0 and util_num.count_bin_1(args.get_int('H4LOOT_PAINT', 0)) or curr_paint * 2 -
-                               1
+                1
         end
         if RB_G.cfgs:get('HEIST', 'cayo_cash_c_on') then
             kwargs.cash = curr_cash == 0 and util_num.count_bin_1(args.get_int('H4LOOT_CASH_C', 0)) or curr_cash * 2
