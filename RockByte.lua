@@ -255,33 +255,27 @@ RB_U.menus_set({ 'heist_cayo_mode', {
 } }, { 'heist_cayo_c_cash', {
     str_data = { '默认', '2', '4', '6', '8' },
     value = RB_G.cfgs:get('HEIST', 'cayo_cash_c_number'),
-    on = RB_G.cfgs:get('HEIST', 'cayo_cash_c_on'),
-    threaded = false
+    on = RB_G.cfgs:get('HEIST', 'cayo_cash_c_on')
 } }, { 'heist_cayo_i_cash', {
     str_data = { '默认', '3', '6', '9', '12', '15', '18', '21', '24' },
     value = RB_G.cfgs:get('HEIST', 'cayo_cash_i_number'),
-    on = RB_G.cfgs:get('HEIST', 'cayo_cash_i_on'),
-    threaded = false
+    on = RB_G.cfgs:get('HEIST', 'cayo_cash_i_on')
 } }, { 'heist_cayo_weed', {
     str_data = { '默认', '3', '6', '9', '12', '15', '18', '21', '24' },
     value = RB_G.cfgs:get('HEIST', 'cayo_weed_number'),
-    on = RB_G.cfgs:get('HEIST', 'cayo_weed_on'),
-    threaded = false
+    on = RB_G.cfgs:get('HEIST', 'cayo_weed_on')
 } }, { 'heist_cayo_coke', {
     str_data = { '默认', '3', '6', '9', '12', '15', '18', '21', '24' },
     value = RB_G.cfgs:get('HEIST', 'cayo_coke_number'),
-    on = RB_G.cfgs:get('HEIST', 'cayo_coke_on'),
-    threaded = false
+    on = RB_G.cfgs:get('HEIST', 'cayo_coke_on')
 } }, { 'heist_cayo_gold', {
     str_data = { '默认', '2', '4', '6', '8' },
     value = RB_G.cfgs:get('HEIST', 'cayo_gold_number'),
-    on = RB_G.cfgs:get('HEIST', 'cayo_gold_on'),
-    threaded = false
+    on = RB_G.cfgs:get('HEIST', 'cayo_gold_on')
 } }, { 'heist_cayo_paint', {
     str_data = { '默认', '1', '3', '5', '7' },
     value = RB_G.cfgs:get('HEIST', 'cayo_paint_number'),
-    on = RB_G.cfgs:get('HEIST', 'cayo_paint_on'),
-    threaded = false
+    on = RB_G.cfgs:get('HEIST', 'cayo_paint_on')
 } }, { 'heist_cayo_vehicle', {
     str_data = { '虎鲸', '阿尔科诺斯特', '梅杜莎', '隐形歼灭者', '巡逻艇', '长鳍', '全部可用' },
     value = RB_G.cfgs:get('HEIST', 'cayo_vehicle'),

